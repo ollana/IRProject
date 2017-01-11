@@ -1,0 +1,46 @@
+﻿<UserControl x:Class="IRProject_GUI.Home"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="1400" d:DesignWidth="700">
+    <Grid Style="{StaticResource ContentRoot}" Margin="16,10,16,16">
+        <ScrollViewer>
+            <StackPanel MinWidth="250">
+                <TextBlock Text="Hello, welcome to OLLADI Search Engine" FontSize="20"/>
+                <TextBlock TextWrapping="Wrap">
+                  To get started choose source path where the data set is located and the destination path where the output files of the program will be saved.
+                  If you don't set your own setting, default will be use. To start indexing press the START button.<LineBreak/>              
+                </TextBlock>
+                <TextBlock Text="Please select source and destination path" FontSize="20" />
+                <TextBlock Margin="0,10,0,0">
+                    <TextBlock Text="Corpus (source):         " Margin="0,-7,0,0" FontSize="16"/>
+                    <TextBox x:Name="corpus_path" Width="250" Height="25" LostFocus="corpus_path_LostFocus"/>
+                    <Button Content="Browse..." Height="25" Click="Browse_Corpuse"/>
+                </TextBlock>
+                <TextBlock Margin="0,10,0,0">
+                    <TextBlock Text="Save to (destination): " Margin="0,-7,0,0" FontSize="16"/>
+                    <TextBox Name="save_path" Width="250" Height="25" LostFocus="save_path_LostFocus" />
+                    <Button Content="Browse..." Height="25" Click="Browse_Dest"/>
+                </TextBlock>
+                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center">
+                <CheckBox Name="stemming" Content="   With Stemming"  FontSize="20" Width="221" VerticalAlignment="Top" Margin="0,30,0,0" Click="stemming_Click"/>
+                <CheckBox Name="no_stemming" Content="   Without Stemming"  FontSize="20"  VerticalAlignment="Top" Margin="0,30,0,0" Click="nostemming_Click"/>
+                </TextBlock>
+                <TextBlock Text="Select Language" Style="{StaticResource Heading2}" Margin="0,30,0,5" HorizontalAlignment="Center" />
+                <ComboBox Name="comboBox" Width="150" IsReadOnly="True" SelectedIndex="0"/>
+                <Button Name="start_button"  Content="START" Margin="20" Click="Start_Click" HorizontalAlignment="Center" FontSize="30" />
+                <TextBlock Name="ClockTextBlock" TextAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock x:Name="Time" HorizontalAlignment="Center" Visibility="Hidden" TextWrapping="Wrap"/>
+                <Button Name="reset_button" Content="Reset" Margin="20" HorizontalAlignment="Center" Click="Reset_Click" />
+                <TextBlock Text="Dictionary" Style="{StaticResource Heading2}"/>
+                <TextBlock Text="Loads From: "/>
+                <TextBlock x:Name="load_path" Text ="{Binding ElementName=save_path, Path=Text}"/>
+                <TextBlock>To change this path change the destination path at the top of this window </TextBlock>
+                <Button x:Name="Load_btn" Click="Load_Click" Margin="5" Content="Load" Width="211" HorizontalAlignment="Center" />
+                <Button x:Name="Display_dic" Click="Display_Click" Margin="5" Content="Display" Width="211" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

@@ -1,0 +1,25 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="IRProject_GUI" GeneratedClassName="UISettings">
+  <Profiles />
+  <Settings>
+    <Setting Name="DictionaryWithStemming" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Dictionary-WithStemming</Value>
+    </Setting>
+    <Setting Name="DictionaryWithoutStemming" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Dictionary-WithoutStemming</Value>
+    </Setting>
+    <Setting Name="PostingWithStemming" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Posting-WithStemming
+</Value>
+    </Setting>
+    <Setting Name="PostingWithoutStemming" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Posting-WithoutStemming</Value>
+    </Setting>
+    <Setting Name="DocumentsWithStemming" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Documents-WithStemming</Value>
+    </Setting>
+    <Setting Name="DocumentsWithoutStemming" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Documents-WithoutStemming</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

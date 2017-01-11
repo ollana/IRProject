@@ -1,0 +1,14 @@
+D:\oll\IRProject\IRProject-GUI\bin\x64\Release\IRProject-GUI.exe.config
+D:\oll\IRProject\IRProject-GUI\obj\x64\Release\IRProject-GUI.csprojResolveAssemblyReference.cache
+D:\oll\IRProject\IRProject-GUI\obj\x64\Release\DictionaryWindow.baml
+D:\oll\IRProject\IRProject-GUI\obj\x64\Release\MainWindow.baml
+D:\oll\IRProject\IRProject-GUI\obj\x64\Release\Home.baml
+D:\oll\IRProject\IRProject-GUI\obj\x64\Release\App.baml
+D:\oll\IRProject\IRProject-GUI\obj\x64\Release\DictionaryWindow.g.cs
+D:\oll\IRProject\IRProject-GUI\obj\x64\Release\MainWindow.g.cs
+D:\oll\IRProject\IRProject-GUI\obj\x64\Release\Home.g.cs
+D:\oll\IRProject\IRProject-GUI\obj\x64\Release\App.g.cs
+D:\oll\IRProject\IRProject-GUI\obj\x64\Release\IRProject-GUI_MarkupCompile.cache
+D:\oll\IRProject\IRProject-GUI\obj\x64\Release\IRProject-GUI.g.resources
+D:\oll\IRProject\IRProject-GUI\obj\x64\Release\IRProject_GUI.Properties.Resources.resources
+D:\oll\IRProject\IRProject-GUI\obj\x64\Release\IRProject-GUI.csproj.GenerateResource.Cache
