@@ -1,5 +1,4 @@
-﻿using IRProject.Terms;
-using SearchEngine;
+﻿using SearchEngine;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,7 +23,7 @@ namespace IRProject
         string docNum;
         int UniqueTermsInDoc;
         int maxTFInDoc;
-        Dictionary<string,int> termsInDoc;
+        Dictionary<string, int> termsInDoc;
         List<Term> terms;
         Stemmer stemmer;
         HashSet<string> stopWords;
@@ -32,7 +31,6 @@ namespace IRProject
         public List<Document> l_documents = new List<Document>();
         string previousTerm;
         List<string> pairs;
-
         /// <summary>
         /// constructor, creates list of terms, stemmer, indexer and hash set of stop words  
         /// </summary>
@@ -62,8 +60,9 @@ namespace IRProject
         /// </summary>
         /// <param name="text">text </param>
         /// <param name="doc">document</param>
-        public void ParseDoc(List<Tuple<string,int>> text, Document doc)
+        public void ParseDoc(List<Tuple<string, int>> text, Document doc)
         {
+
             index = 0;
             UniqueTermsInDoc = 0;
             maxTFInDoc = 0;
@@ -80,6 +79,8 @@ namespace IRProject
                     TermsToSort = partToParse.Split(splitby, StringSplitOptions.RemoveEmptyEntries);
                     weightOfText = part.Item2;
                     ParseTerms();
+                    index = 0;
+                    previousTerm = null;
                 }
             }
             doc.DocumentLength = location--;
@@ -89,11 +90,11 @@ namespace IRProject
             //after parsing NUMBER_OF_DUCUMENTS_TO_INDEX documents, send the term list to the indexer and start a new list
             if (terms.Count >= NUMBER_OF_Terms_TO_INDEX)
             {
-                indexer.Index(terms,pairs);
+                indexer.Index(terms, pairs);
                 terms.Clear();
                 pairs.Clear();
             }
-            
+
         }
 
         /// <summary>
@@ -108,10 +109,10 @@ namespace IRProject
                 if (!sr.EndOfStream)
                 {
                     string line = sr.ReadLine();
-                    while (line!= null)
+                    while (line != null)
                     {
                         //remove any 's (becouse it was removed from the text ass well)
-                        stopWords.Add(line.Replace("'s", "").Replace("'",""));
+                        stopWords.Add(line.Replace("'s", "").Replace("'", ""));
                         line = sr.ReadLine();
                     }
                 }
@@ -156,7 +157,7 @@ namespace IRProject
         /// <param name="termToParse"> term </param>
         private void ParseTerm(string termToParse)
         {
-            if (termToParse.Length>0)
+            if (termToParse.Length > 0)
             {
                 Term term = new Term(termToParse, docNum);
                 //if the term is a fraction or number followed by a fraction 
@@ -164,7 +165,7 @@ namespace IRProject
                 checkNumber(term);
                 if (!term.Saved)
                     checkPrecentage(term);
-                if (!term.Saved )
+                if (!term.Saved)
                     checkPrice(term);
                 if (!term.Saved)
                     checkDate(term);
@@ -195,7 +196,7 @@ namespace IRProject
             //if the word is a fraction save it as a number
             else if (isWordFraction(term.Value))
             {
-                string[] frac =term.Value.Split('/');
+                string[] frac = term.Value.Split('/');
                 term.AddFraction(Convert.ToDouble(frac[0]), Convert.ToDouble(frac[1]));
             }
         }
@@ -239,7 +240,7 @@ namespace IRProject
                     term.Value += "%";
                     addTermToTermList(term);
                 }
-                else if (term.Value.Length== 0)
+                else if (term.Value.Length == 0)
                     term.Saved = true;
             }
 
@@ -277,10 +278,10 @@ namespace IRProject
         {
             string month = monthOfTerm(term.Value);
             //if the term is a month check if its followed a date if so marge it to one date term
-            if (month!="0")
-                makeDateStartWithMonth(month,term);
-                
-            else if (term.Value.Length>2 && term.Value.Substring(term.Value.Length-2) =="th")
+            if (month != "0")
+                makeDateStartWithMonth(month, term);
+
+            else if (term.Value.Length > 2 && term.Value.Substring(term.Value.Length - 2) == "th")
             {
                 string originalTerm = term.Value;
                 term.Value = term.Value.Replace("th", "");
@@ -346,7 +347,7 @@ namespace IRProject
         {
             if (!stopWords.Contains(term.Value))
             {
-                if(IRSettings.Default.Stemming)
+                if (IRSettings.Default.Stemming)
                     term.Value = stemmer.stemTerm(term.Value);
                 addTermToTermList(term);
             }
@@ -381,13 +382,14 @@ namespace IRProject
                 if (previousTerm != null)
                     pairs.Add(previousTerm + "~" + term.Value);
                 previousTerm = term.Value;
+
             }
         }
 
         /// <summary>
         /// if month followed by a date(day,year or year only), marge the term to a date and save it
         /// </summary>
-        private void makeDateStartWithMonth(string month,Term term)
+        private void makeDateStartWithMonth(string month, Term term)
         {
             if (index < TermsToSort.Length - 1)
             {
@@ -409,14 +411,14 @@ namespace IRProject
                                 index++;
                             }
                         }
-                        term.Value= (year + month + "-" + day);
+                        term.Value = (year + month + "-" + day);
                         addTermToTermList(term);
                     }
                     else if (nextword.Length == 4)
                     {
                         index++;
                         year = nextword + "-";
-                        term.Value= (year + month);
+                        term.Value = (year + month);
                         addTermToTermList(term);
                     }
                 }
@@ -489,7 +491,7 @@ namespace IRProject
                     {
                         Term term = new Term(phrase[i], docNum);
                         checkFraction(term);
-                        if(term.IsNumeric)
+                        if (term.IsNumeric)
                             //convert to "Million" expression if nessesery
                             ConvertToMillion(term);
 
@@ -667,7 +669,7 @@ namespace IRProject
                 }
             }
             index++;
-            term.Value=(year + month + "-" + day);
+            term.Value = (year + month + "-" + day);
 
         }
         /// <summary>
@@ -832,7 +834,7 @@ namespace IRProject
                 }
             }
             text = new string(chars);
-            text = text.Replace(",", "").Replace('[', ' ').Replace(']', ' ').Replace('(', ' ').Replace(')', ' ').Replace(';', ' ').Replace(':', ' ').Replace('{', ' ').Replace('}', ' ').Replace('!', ' ').Replace('?', ' ').Replace('|', ' ').Replace('#', ' ').Replace('"', ' ').Replace('<', ' ').Replace('>', ' ').Replace('*', ' ').Replace('+', ' ').Replace('=', ' ').Replace('`', ' ').Replace("�", "").Replace("\\","").Replace('_',' ').Replace('~',' ').Replace('@',' ');
+            text = text.Replace(",", "").Replace('[', ' ').Replace(']', ' ').Replace('(', ' ').Replace(')', ' ').Replace(';', ' ').Replace(':', ' ').Replace('{', ' ').Replace('}', ' ').Replace('!', ' ').Replace('?', ' ').Replace('|', ' ').Replace('#', ' ').Replace('"', ' ').Replace('<', ' ').Replace('>', ' ').Replace('*', ' ').Replace('+', ' ').Replace('=', ' ').Replace('`', ' ').Replace("�", "").Replace("\\", "").Replace('_', ' ').Replace('~', ' ').Replace('@', ' ');
             text = text.Replace("'s ", " ");
             text = text.Replace("'", "");
             return text;
@@ -847,12 +849,12 @@ namespace IRProject
         {
             if (terms.Count > 0)
             {
-                indexer.Index(terms,pairs);
+                indexer.Index(terms, pairs);
                 terms.Clear();
                 pairs.Clear();
             }
-             indexer.MergeAll();
-             SaveDocuments();
+            indexer.MergeAll();
+            SaveDocuments();
         }
 
         /// <summary>
@@ -862,7 +864,7 @@ namespace IRProject
         {
             string path = IRSettings.Default.Destination;
             if (IRSettings.Default.Stemming)
-                path +="\\Documents-WithStemming";
+                path += "\\Documents-WithStemming";
             else
                 path += "\\Documents-WithoutStemming";
             File.Create(path).Close();
@@ -872,7 +874,7 @@ namespace IRProject
                 {
                     sw.WriteLine(doc.ToString());
                 }
-            }          
+            }
         }
     }
 }

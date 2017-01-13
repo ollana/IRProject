@@ -7,6 +7,8 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using IRProject;
 
 namespace IRProject_GUI
 {
@@ -15,11 +17,13 @@ namespace IRProject_GUI
     /// </summary>
     public partial class Home : UserControl
     {
-        public System.Collections.Generic.Dictionary<string, Tuple<string, string>> Dictionary; 
+        public Dictionary<string, Tuple<string, string>> Dictionary1; 
         public string Corpus { get { return corpus_path.Text; } set { corpus = value; corpus_path.Text = value; } }
         public string Destination { get { return save_path.Text; } set { destination = value; save_path.Text = value; } }
         public bool Stemming { get { return stemming.IsChecked.Value; } set { stemm = value; } }
 
+
+        public
         //for stop watch
         DispatcherTimer dt = new DispatcherTimer();
         Stopwatch stopWatch = new Stopwatch();
@@ -31,6 +35,7 @@ namespace IRProject_GUI
         bool stemm;
         object[] obj;
         TaskScheduler _ui;
+        Searcher m_searcher;
 
         /// <summary>
         /// constractor
@@ -40,6 +45,7 @@ namespace IRProject_GUI
             InitializeComponent();
             Corpus = System.IO.Directory.GetCurrentDirectory();
             Destination = System.IO.Directory.GetCurrentDirectory();
+            m_searcher = new Searcher();
             stemming.IsChecked = true;
             Stemming = true;
             no_stemming.IsChecked = false;
@@ -204,7 +210,7 @@ namespace IRProject_GUI
             var result = MessageBox.Show("Are you sure you whant to reset settings? \nthe following will delete posting and dictionary files! \nallso it will reset the main memory of the program.", "RESET", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (result.ToString() == "Yes")
             {
-                Dictionary = null;
+                Dictionary1 = null;
                 if (!System.IO.Directory.Exists(Destination))
                 {
                     MessageBox.Show("Destination path could not be found", "path not found", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -245,25 +251,39 @@ namespace IRProject_GUI
                 path = Destination + "\\" + UISettings.Default.DictionaryWithoutStemming;
             if (System.IO.File.Exists(path))
             {
-                Dictionary =  new System.Collections.Generic.Dictionary<string, Tuple<string, string>>(); 
+                m_searcher.LoadDictionary(path);   
+                Dictionary1 =  new Dictionary<string, Tuple<string, string>>();
+
                 using (System.IO.StreamReader sr = new System.IO.StreamReader(path))
                 {
                     string line = sr.ReadLine();
+                    int lineNum = 0;
                     
                     while (line!=null)
                     {
                         if(line!=string.Empty)
                         {
                             string[] split = line.Split('|');
-                            Dictionary.Add(split[0], new Tuple<string, string>(split[1], split[2]));
+                            Dictionary1.Add(split[0], new Tuple<string, string>(split[1], split[2]));
                         }
                         line = sr.ReadLine();
+                        lineNum++;
                     }                    
                 }
                 MessageBox.Show("Dictionary was loaded");
             }
             else
                 MessageBox.Show("could not find dictionary path:\n" + path,"Error",MessageBoxButton.OK,MessageBoxImage.Error);
+            path = Destination + "\\Pairs-WithoutStemming";
+
+            if (System.IO.File.Exists(path))
+            {
+
+                m_searcher.LoadPairs(path);
+            }
+            else
+                MessageBox.Show("could not find dictionary path:\n" + path, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+
 
             Display_dic.IsEnabled = true;
         }
@@ -272,7 +292,7 @@ namespace IRProject_GUI
         /// </summary>
         private void Display_Click(object sender, RoutedEventArgs e)
         {
-            if (Dictionary == null)
+            if (Dictionary1 == null)
             {
                 MessageBox.Show("there is no dictionary in the program memory.\nplease select load first", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -280,7 +300,7 @@ namespace IRProject_GUI
             try
             {
                 DictionaryWindow dw = new DictionaryWindow();
-                dw.TableDic(Dictionary, stemm);
+                dw.TableDic(Dictionary1, stemm);
                 dw.ShowDialog();
             }
             catch

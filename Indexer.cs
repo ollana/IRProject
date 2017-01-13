@@ -1,10 +1,9 @@
 ﻿
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using IRProject.Terms;
 using System.IO;
 
 namespace IRProject
@@ -26,7 +25,7 @@ namespace IRProject
         /// <summary>
         /// Empty constractor
         /// </summary>
-        public Indexer() 
+        public Indexer()
         {
             FileCount = 0;
             numOfUniqueTerms = 0;
@@ -36,11 +35,12 @@ namespace IRProject
         /// </summary>
         /// <param name="TermsList"> term list</param>
         ///<param Pairs="terms"> list of pairs</param>
-        public void Index(List<Term> TermsList,List<string> Pairs)
+        public void Index(List<Term> TermsList, List<string> Pairs)
         {
-            Term[] TermsArray=TermsList.OrderBy(t => t.Value).ToArray();
-            Pairs.Sort();
-            Pairs=MargePairs(Pairs);
+            Term[] TermsArray = TermsList.OrderBy(t => t.Value, StringComparer.Ordinal).ToArray();
+            Pairs = Pairs.OrderBy(t => t, StringComparer.Ordinal).ToList();
+
+            Pairs = MargePairs(Pairs);
             List<string> mergedList = MargeTerms(TermsArray);
             string FilePath = IRSettings.Default.Destination + "\\Indexer" + FileCount;
             if (!File.Exists(FilePath))
@@ -48,7 +48,7 @@ namespace IRProject
             using (StreamWriter sw = new StreamWriter(FilePath))
             {
                 foreach (string line in mergedList)
-                        sw.WriteLine(line);
+                    sw.WriteLine(line);
             }
             FilePath = IRSettings.Default.Destination + "\\Pairs" + FileCount;
             if (!File.Exists(FilePath))
@@ -69,8 +69,8 @@ namespace IRProject
         private List<string> MargePairs(List<string> Pairs)
         {
             List<string> margedPairs = new List<string>();
-            string previousPair="";
-            int counter=0;
+            string previousPair = "";
+            int counter = 0;
             foreach (string p in Pairs)
             {
                 if (previousPair == "")
@@ -84,7 +84,7 @@ namespace IRProject
                         counter++;
                     else
                     {
-                        margedPairs.Add(p + "#" + counter);
+                        margedPairs.Add(previousPair + "#" + counter);
                         previousPair = p;
                         counter = 1;
                     }
@@ -100,12 +100,12 @@ namespace IRProject
         /// </summary>
         public void MergeAll()
         {
-            int counter = 0; 
-            int NumOfFiles = (FileCount*2)-1;
-            while (FileCount<NumOfFiles)
+            int counter = 0;
+            int NumOfFiles = (FileCount * 2) - 1;
+            while (FileCount < NumOfFiles)
             {
                 MergeTwo(counter, "Indexer");
-                MergeTwo(counter,"Pairs");
+                MergeTwo(counter, "Pairs");
                 counter += 2;
                 FileCount++;
             }
@@ -120,52 +120,52 @@ namespace IRProject
                 stemming = "-WithStemming";
             else
                 stemming = "-WithoutStemming";
-            if (!File.Exists(IRSettings.Default.Destination+"\\Pairs"+stemming))
-                File.Create(IRSettings.Default.Destination + "\\Pairs"+stemming).Close();
+            if (!File.Exists(IRSettings.Default.Destination + "\\Pairs" + stemming))
+                File.Create(IRSettings.Default.Destination + "\\Pairs" + stemming).Close();
 
             using (StreamWriter pairs = new StreamWriter(IRSettings.Default.Destination + "\\Pairs" + stemming))
             {
-                    using (StreamReader sr = new StreamReader(IRSettings.Default.Destination + "\\Pairs" + (FileCount - 1)))
+                using (StreamReader sr = new StreamReader(IRSettings.Default.Destination + "\\Pairs" + (FileCount - 1)))
+                {
+                    List<Tuple<string, int>> pairsOfTerm = new List<Tuple<string, int>>();
+                    string previousTerm = "";
+                    List<string> topPair;
+                    string pairLine;
+                    while (!sr.EndOfStream)
                     {
-                        List<Tuple<string, int>> pairsOfTerm = new List<Tuple<string, int>>();
-                        string previousTerm = "";
-                        List<string> topPair;
-                        string pairLine;
-                        while (!sr.EndOfStream)
+                        string line = sr.ReadLine();
+                        string[] splitedLine = line.Split('~');
+                        if (previousTerm != "" && previousTerm != splitedLine[0])
                         {
-                            string line = sr.ReadLine();
-                            string[] splitedLine=line.Split('~');
-                            if (previousTerm!=""&& previousTerm != splitedLine[0])
-                            {
-                                topPair = findTop5(pairsOfTerm);
-                                pairLine=previousTerm+"~";
-                                foreach (string t in topPair)
-                                    pairLine += t+"|";
-                                pairs.WriteLine(pairLine);
-                                pairsOfTerm.Clear();
-                            }
-                            previousTerm = splitedLine[0];
-                            string[] split = splitedLine[1].Split('#');
-                            pairsOfTerm.Add(new Tuple<string, int>(split[0], Convert.ToInt32(split[1])));
-                            
+                            topPair = findTop5(pairsOfTerm);
+                            pairLine = previousTerm + "~";
+                            foreach (string t in topPair)
+                                pairLine += t + "|";
+                            pairs.WriteLine(pairLine);
+                            pairsOfTerm.Clear();
                         }
-                        topPair = findTop5(pairsOfTerm);
-                        pairLine = previousTerm + "~";
-                        foreach (string t in topPair)
-                            pairLine += t + "|";
-                        pairs.WriteLine(pairLine);
-                        pairsOfTerm.Clear();
+                        previousTerm = splitedLine[0];
+                        string[] split = splitedLine[1].Split('#');
+                        pairsOfTerm.Add(new Tuple<string, int>(split[0], Convert.ToInt32(split[1])));
+
                     }
-                
+                    topPair = findTop5(pairsOfTerm);
+                    pairLine = previousTerm + "~";
+                    foreach (string t in topPair)
+                        pairLine += t + "|";
+                    pairs.WriteLine(pairLine);
+                    pairsOfTerm.Clear();
+                }
+
             }
             File.Delete(IRSettings.Default.Destination + "\\Pairs" + (FileCount - 1));
-        
+
         }
 
         private List<string> findTop5(List<Tuple<string, int>> pairsOfTerm)
         {
-            List<string> top5=new List<string>();
-            pairsOfTerm= pairsOfTerm.OrderBy(p => p.Item2).ToList<Tuple<string,int>>();
+            List<string> top5 = new List<string>();
+            pairsOfTerm = pairsOfTerm.OrderBy(p => p.Item2).ToList<Tuple<string, int>>();
             pairsOfTerm.Reverse();
             foreach (Tuple<string, int> item in pairsOfTerm)
             {
@@ -177,8 +177,8 @@ namespace IRProject
             return top5;
         }
 
-        
-        
+
+
         /// <summary>
         /// this method seperate the merged files into posting file and dictionart file
         /// </summary>
@@ -189,10 +189,10 @@ namespace IRProject
                 stemming = "-WithStemming";
             else
                 stemming = "-WithoutStemming";
-            if (!File.Exists(IRSettings.Default.Destination+"\\Posting"+stemming))
-                File.Create(IRSettings.Default.Destination + "\\Posting"+stemming).Close();
-            if (!File.Exists(IRSettings.Default.Destination + "\\Dictionary"+stemming))
-                File.Create(IRSettings.Default.Destination + "\\Dictionary"+stemming).Close();
+            if (!File.Exists(IRSettings.Default.Destination + "\\Posting" + stemming))
+                File.Create(IRSettings.Default.Destination + "\\Posting" + stemming).Close();
+            if (!File.Exists(IRSettings.Default.Destination + "\\Dictionary" + stemming))
+                File.Create(IRSettings.Default.Destination + "\\Dictionary" + stemming).Close();
 
             using (StreamWriter posting = new StreamWriter(IRSettings.Default.Destination + "\\Posting" + stemming))
             {
@@ -231,7 +231,7 @@ namespace IRProject
                 {
                     using (StreamWriter sw = new StreamWriter(IRSettings.Default.Destination + "\\" + type + FileCount))
                     {
-                    START:
+                        START:
                         string Line1 = sr1.ReadLine();
                         string Line2 = sr2.ReadLine();
 
@@ -245,8 +245,8 @@ namespace IRProject
                                 switch (type)
                                 {
                                     case "Pairs":
-                                         mergeLine = Line1Splite[0] + "#" + (Convert.ToInt32(Line1Splite[1]) + Convert.ToInt32(Line2Splite[1]));
-                                         sw.WriteLine(mergeLine);
+                                        mergeLine = Line1Splite[0] + "#" + (Convert.ToInt32(Line1Splite[1]) + Convert.ToInt32(Line2Splite[1]));
+                                        sw.WriteLine(mergeLine);
                                         break;
                                     case "Indexer":
                                         string posting = Line1Splite[1] + "|" + Line2Splite[1];
@@ -258,7 +258,7 @@ namespace IRProject
                             }
                             else
                             {
-                                if (string.Compare(Line1Splite[0], Line2Splite[0]) < 0)
+                                if (string.Compare(Line1Splite[0], Line2Splite[0], StringComparison.Ordinal) < 0)
                                 {
                                     sw.WriteLine(Line1);
                                     Line1 = sr1.ReadLine();
@@ -299,7 +299,7 @@ namespace IRProject
             Term CurrentTerm = SortedTerms[0];
 
             START:
-            string DocNum_Location_Weight = CurrentTerm.DocNum + " " + CurrentTerm.Location+","+CurrentTerm.Weight;
+            string DocNum_Location_Weight = CurrentTerm.DocNum + " " + CurrentTerm.Location + "," + CurrentTerm.Weight;
             string CurrentTermValue = CurrentTerm.Value;
             string LastDocNum = CurrentTerm.DocNum;
 
@@ -309,10 +309,10 @@ namespace IRProject
                 if (t.Value == CurrentTermValue)
                 {
                     if (LastDocNum == t.DocNum)
-                        DocNum_Location_Weight += " " + t.Location+","+t.Weight;
+                        DocNum_Location_Weight += " " + t.Location + "," + t.Weight;
                     else
                     {
-                        DocNum_Location_Weight += "|" + t.DocNum + " " + t.Location+","+t.Weight;
+                        DocNum_Location_Weight += "|" + t.DocNum + " " + t.Location + "," + t.Weight;
                         LastDocNum = t.DocNum;
                     }
                 }

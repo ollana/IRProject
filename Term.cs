@@ -4,16 +4,28 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IRProject.Terms
+namespace IRProject
 {
-    class Term
+    public class Term
     {
-        string term;
-        string docNumber;
-        int location;
-        bool saved;
-        bool isNumeric=false;
-        int weight;
+        string m_term;
+        string m_docNumber;
+        int m_location;
+        bool m_saved;
+        bool m_isNumeric=false;
+        int m_weight;
+
+        private int m_tf;
+        private int m_df;
+        private int m_line;
+
+        public Term(string term, int tf, int df, int line)
+        {
+            m_term = term;
+            m_tf = tf;
+            m_df = df;
+            m_line = line;
+        }
 
         /// <summary>
         /// create a term
@@ -22,10 +34,10 @@ namespace IRProject.Terms
         /// <param name="doc_num">document number</param>
         public Term(string t ,string doc_num)
         {
-            term = t;
+            m_term = t;
             checkIfNumber();
-            docNumber = doc_num;
-            saved = false;
+            m_docNumber = doc_num;
+            m_saved = false;
         }
 
 
@@ -34,7 +46,7 @@ namespace IRProject.Terms
         private void checkIfNumber()
         {
             double n;
-            isNumeric = Double.TryParse(term, out n);
+            m_isNumeric = Double.TryParse(m_term, out n);
 
         }
         /// <summary>
@@ -44,19 +56,19 @@ namespace IRProject.Terms
         /// <param name="denominator"> denominator</param>
         public void AddFraction(double numerator, double denominator)
         {
-            if (isNumeric)
-                term = Math.Round(Convert.ToDouble(term) +numerator / denominator,4)+ "";
+            if (m_isNumeric)
+                m_term = Math.Round(Convert.ToDouble(m_term) +numerator / denominator,4)+ "";
             else
-                term = Math.Round(numerator / denominator,4) + "";
-            isNumeric = true;
+                m_term = Math.Round(numerator / denominator,4) + "";
+            m_isNumeric = true;
         }
         /// <summary>
         /// the term
         /// </summary>
         public string Value
         {
-            get { return term; }
-            set { term = value; }
+            get { return m_term; }
+            set { m_term = value; }
 
         }
         /// <summary>
@@ -64,31 +76,31 @@ namespace IRProject.Terms
         /// </summary>
         public int Weight
         {
-            get { return weight; }
-            set { weight = value; }
+            get { return m_weight; }
+            set { m_weight = value; }
         }
         /// <summary>
         /// document number of the term
         /// </summary>
         public string DocNum
         {
-            get { return docNumber; }
+            get { return m_docNumber; }
         }
         /// <summary>
         /// location on document
         /// </summary>
         public int Location
         {
-            get { return location; }
-            set { location=value; }
+            get { return m_location; }
+            set { m_location=value; }
         }
         /// <summary>
         /// is term already saved
         /// </summary>
         public bool Saved
         {
-            get { return saved; }
-            set { saved = value; }
+            get { return m_saved; }
+            set { m_saved = value; }
         }
         /// <summary>
         /// is term numeric
@@ -98,8 +110,20 @@ namespace IRProject.Terms
             get
             {
                 checkIfNumber();
-                return isNumeric;
+                return m_isNumeric;
             }
+        }
+        public int TF
+        {
+            get { return m_tf; }
+        }
+        public int DF
+        {
+            get { return m_df; }
+        }
+        public int LineNumber
+        {
+            get { return m_line; }
         }
     }
 }
