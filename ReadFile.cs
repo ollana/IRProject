@@ -148,6 +148,11 @@ namespace IRProject
                             }
                             line = line.Replace("</H3>", "").Replace("</TI>", "");
                             docTitle += line.Trim() + " ";
+                            if (tempText != string.Empty)
+                            {
+                                docText.Add(new Tuple<string, int>(tempText.ToLower().Trim(), 0));
+                                tempText = string.Empty;
+                            }
                             docText.Add(new Tuple<string, int>(docTitle.ToLower().Trim(), 9));
                             line = sr.ReadLine().Trim();
                             break;
@@ -193,23 +198,7 @@ namespace IRProject
                             while (line != "</TEXT>")
                             {
                                 if (line.StartsWith("<H"))
-                                {
-                                    docText.Add(new Tuple<string, int>(tempText.ToLower().Trim(), 0));
-                                    tempText = string.Empty;
-
-                                    string wight = line.Trim().Substring(2, 1);
-                                    line = line.Replace("<H" + wight + ">", "");
-
-                                    while (!line.EndsWith("</H" + wight + ">"))
-                                    {
-                                        tempText += line.Trim() + " ";
-                                        line = sr.ReadLine().Trim();
-                                    }
-                                    line = line.Replace("</H" + wight + ">", "");
-                                    tempText += line.Trim() + " ";
-                                    docText.Add(new Tuple<string, int>(tempText.ToLower().Trim(), Convert.ToInt32(wight)));
-                                    tempText = string.Empty;
-                                }
+                                    goto case "<H8>";
                                 else if (line != string.Empty)
                                     tempText += line.Trim() + " ";
                                 line = sr.ReadLine().Trim();
