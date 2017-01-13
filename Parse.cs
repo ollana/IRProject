@@ -32,7 +32,6 @@ namespace IRProject
         public List<Document> l_documents = new List<Document>();
         string previousTerm;
         List<string> pairs;
-
         /// <summary>
         /// constructor, creates list of terms, stemmer, indexer and hash set of stop words  
         /// </summary>
@@ -64,6 +63,7 @@ namespace IRProject
         /// <param name="doc">document</param>
         public void ParseDoc(List<Tuple<string,int>> text, Document doc)
         {
+
             index = 0;
             UniqueTermsInDoc = 0;
             maxTFInDoc = 0;
@@ -80,6 +80,8 @@ namespace IRProject
                     TermsToSort = partToParse.Split(splitby, StringSplitOptions.RemoveEmptyEntries);
                     weightOfText = part.Item2;
                     ParseTerms();
+                    index = 0;
+                    previousTerm = null;
                 }
             }
             doc.DocumentLength = location--;
@@ -381,6 +383,7 @@ namespace IRProject
                 if (previousTerm != null)
                     pairs.Add(previousTerm + "~" + term.Value);
                 previousTerm = term.Value;
+
             }
         }
 

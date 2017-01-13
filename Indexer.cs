@@ -31,6 +31,7 @@ namespace IRProject
             FileCount = 0;
             numOfUniqueTerms = 0;
         }
+        string[] PairsArray;
         /// <summary>
         /// this method gets a list of unsorted terms, sorts them and group all identical terms (with the same value). 
         /// </summary>
@@ -38,8 +39,9 @@ namespace IRProject
         ///<param Pairs="terms"> list of pairs</param>
         public void Index(List<Term> TermsList,List<string> Pairs)
         {
-            Term[] TermsArray=TermsList.OrderBy(t => t.Value).ToArray();
-            Pairs.Sort();
+            Term[] TermsArray = TermsList.OrderBy(t => t.Value, StringComparer.Ordinal).ToArray();
+            Pairs = Pairs.OrderBy(t => t, StringComparer.Ordinal).ToList();
+
             Pairs=MargePairs(Pairs);
             List<string> mergedList = MargeTerms(TermsArray);
             string FilePath = IRSettings.Default.Destination + "\\Indexer" + FileCount;
@@ -84,7 +86,7 @@ namespace IRProject
                         counter++;
                     else
                     {
-                        margedPairs.Add(p + "#" + counter);
+                        margedPairs.Add(previousPair + "#" + counter);
                         previousPair = p;
                         counter = 1;
                     }
@@ -258,7 +260,7 @@ namespace IRProject
                             }
                             else
                             {
-                                if (string.Compare(Line1Splite[0], Line2Splite[0]) < 0)
+                                if (string.Compare(Line1Splite[0], Line2Splite[0], StringComparison.Ordinal) < 0)
                                 {
                                     sw.WriteLine(Line1);
                                     Line1 = sr1.ReadLine();
