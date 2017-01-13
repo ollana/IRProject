@@ -30,11 +30,7 @@ namespace IRProject
         Indexer indexer;
         public List<Document> l_documents = new List<Document>();
         string previousTerm;
-<<<<<<< HEAD
         List<string> pairs;
-=======
-        List<string> pairs;
->>>>>>> origin/master
         /// <summary>
         /// constructor, creates list of terms, stemmer, indexer and hash set of stop words  
         /// </summary>
@@ -64,13 +60,8 @@ namespace IRProject
         /// </summary>
         /// <param name="text">text </param>
         /// <param name="doc">document</param>
-<<<<<<< HEAD
         public void ParseDoc(List<Tuple<string, int>> text, Document doc)
         {
-=======
-        public void ParseDoc(List<Tuple<string,int>> text, Document doc)
-        {
->>>>>>> origin/master
 
             index = 0;
             UniqueTermsInDoc = 0;
@@ -87,13 +78,8 @@ namespace IRProject
                     char[] splitby = { ' ' };
                     TermsToSort = partToParse.Split(splitby, StringSplitOptions.RemoveEmptyEntries);
                     weightOfText = part.Item2;
-<<<<<<< HEAD
                     ParseTerms();
                     index = 0;
-=======
-                    ParseTerms();
-                    index = 0;
->>>>>>> origin/master
                     previousTerm = null;
                 }
             }

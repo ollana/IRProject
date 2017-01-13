@@ -30,27 +30,17 @@ namespace IRProject
             FileCount = 0;
             numOfUniqueTerms = 0;
         }
-        string[] PairsArray;
         /// <summary>
         /// this method gets a list of unsorted terms, sorts them and group all identical terms (with the same value). 
         /// </summary>
         /// <param name="TermsList"> term list</param>
         ///<param Pairs="terms"> list of pairs</param>
-<<<<<<< HEAD
         public void Index(List<Term> TermsList, List<string> Pairs)
         {
             Term[] TermsArray = TermsList.OrderBy(t => t.Value, StringComparer.Ordinal).ToArray();
             Pairs = Pairs.OrderBy(t => t, StringComparer.Ordinal).ToList();
 
             Pairs = MargePairs(Pairs);
-=======
-        public void Index(List<Term> TermsList,List<string> Pairs)
-        {
-            Term[] TermsArray = TermsList.OrderBy(t => t.Value, StringComparer.Ordinal).ToArray();
-            Pairs = Pairs.OrderBy(t => t, StringComparer.Ordinal).ToList();
-
-            Pairs=MargePairs(Pairs);
->>>>>>> origin/master
             List<string> mergedList = MargeTerms(TermsArray);
             string FilePath = IRSettings.Default.Destination + "\\Indexer" + FileCount;
             if (!File.Exists(FilePath))
@@ -93,11 +83,7 @@ namespace IRProject
                     if (p == previousPair)
                         counter++;
                     else
-<<<<<<< HEAD
                     {
-=======
-                    {
->>>>>>> origin/master
                         margedPairs.Add(previousPair + "#" + counter);
                         previousPair = p;
                         counter = 1;
@@ -271,11 +257,7 @@ namespace IRProject
                                 goto START;
                             }
                             else
-<<<<<<< HEAD
                             {
-=======
-                            {
->>>>>>> origin/master
                                 if (string.Compare(Line1Splite[0], Line2Splite[0], StringComparison.Ordinal) < 0)
                                 {
                                     sw.WriteLine(Line1);
