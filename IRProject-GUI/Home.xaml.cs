@@ -45,7 +45,6 @@ namespace IRProject_GUI
             InitializeComponent();
             Corpus = System.IO.Directory.GetCurrentDirectory();
             Destination = System.IO.Directory.GetCurrentDirectory();
-            m_searcher = new Searcher();
             stemming.IsChecked = true;
             Stemming = true;
             no_stemming.IsChecked = false;
@@ -238,6 +237,7 @@ namespace IRProject_GUI
         /// </summary>
         private void Load_Click(object sender, RoutedEventArgs e)
         {
+            m_searcher = new Searcher(Corpus);
             Display_dic.IsEnabled = false;
             if (!System.IO.Directory.Exists(Destination))
             {
@@ -283,7 +283,7 @@ namespace IRProject_GUI
             }
             else
                 MessageBox.Show("could not find dictionary path:\n" + path, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-
+           //   m_searcher.Search("wildcat wildcat million wild-cat wildcat 0.1");
 
             Display_dic.IsEnabled = true;
         }

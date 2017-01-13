@@ -15,6 +15,7 @@ namespace IRProject
     /// </summary>
     class Parse
     {
+        enum TYPE { Corpus,Query};
         const int NUMBER_OF_Terms_TO_INDEX = 100000;
         string[] TermsToSort;
         int weightOfText;
@@ -31,6 +32,7 @@ namespace IRProject
         public List<Document> l_documents = new List<Document>();
         string previousTerm;
         List<string> pairs;
+        TYPE ParseType;
         /// <summary>
         /// constructor, creates list of terms, stemmer, indexer and hash set of stop words  
         /// </summary>
@@ -43,6 +45,7 @@ namespace IRProject
             indexer = new Indexer();
             pairs = new List<string>();
             LoadstopWords(DocumentPath);
+            ParseType = TYPE.Query;
 
         }
 
@@ -62,7 +65,7 @@ namespace IRProject
         /// <param name="doc">document</param>
         public void ParseDoc(List<Tuple<string, int>> text, Document doc)
         {
-
+            ParseType = TYPE.Corpus;
             index = 0;
             UniqueTermsInDoc = 0;
             maxTFInDoc = 0;
@@ -95,6 +98,29 @@ namespace IRProject
                 pairs.Clear();
             }
 
+        }
+        /// <summary>
+        /// parse a query
+        /// </summary>
+        /// <param name="query">query</param>
+        /// <returns>list of terms in query</returns>
+        public List<string> ParseQuery(string query)
+        {
+            ParseType = TYPE.Query;
+            terms.Clear();
+            index = 0;
+            docNum = "";
+            string partToParse = RemovePunctuationMarks(query);
+            char[] splitby = { ' ' };
+            TermsToSort = partToParse.Split(splitby, StringSplitOptions.RemoveEmptyEntries);
+            ParseTerms();
+            List<string> termsInQuery = new List<string>();
+            foreach (Term t in terms)
+            {
+                termsInQuery.Add(t.Value);
+            }
+            terms.Clear();
+            return termsInQuery;
         }
 
         /// <summary>
@@ -361,7 +387,7 @@ namespace IRProject
         /// <param name="term">term </param>
         private void addTermToTermList(Term term)
         {
-            if (term.Value.Length > 0)
+            if (ParseType==TYPE.Corpus && term.Value.Length > 0)
             {
                 if (!termsInDoc.ContainsKey(term.Value))
                 {
@@ -383,6 +409,11 @@ namespace IRProject
                     pairs.Add(previousTerm + "~" + term.Value);
                 previousTerm = term.Value;
 
+            }
+            else if(ParseType == TYPE.Corpus)
+            {
+                terms.Add(term);
+                term.Saved = true;
             }
         }
 
