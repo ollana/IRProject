@@ -7,14 +7,14 @@ namespace IRProject.Ranker
         List<QueryTerm> _Query;
         BM25 bm;
         Document _doc;
-        public Ranker(List<QueryTerm> Query)
+        public Ranker()
         {
-            _Query = Query;
             bm = new BM25(1.2, 100, 0.75, 0, 0);
         }
-        public double Rank(Document doc)
+        public double Rank(List<QueryTerm> Query, Document doc)
         {
             _doc = doc;
+            _Query = Query;
             double DocRank = bm.Score(doc, _Query);
             DocRank += PlaceRank();
             DocRank += TagRank();
