@@ -1,30 +1,47 @@
-﻿using IRProject.Terms;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace IRProject.Ranker
 {
     class Ranker
     {
-        List<Term> _termsOfQuery;
-        Dictionary<string, double> _DocumentsScoure;
-        double _AverageDocLength;
-        int _NumberOfDocuments;
-        
-        string _Query;
-
-        public Ranker(List<QueryTerm> Query, Document doc)
+        List<QueryTerm> _Query;
+        BM25 bm;
+        Document _doc;
+        public Ranker(List<QueryTerm> Query)
         {
-            _DocumentsScoure = new Dictionary<string, double>();
-            _termsOfQuery = new List<Term>();
-            _NumberOfDocuments = IRSettings.Default.NumberOfDocuments;
-            _AverageDocLength = IRSettings.Default.AverageDocLength;
-            _Query = query;
-            _termsOfQuery = Query;
+            _Query = Query;
+            bm = new BM25(1.2, 100, 0.75, 0, 0);
         }
-        
+        public double Rank(Document doc)
+        {
+            _doc = doc;
+            double DocRank = bm.Score(doc, _Query);
+            DocRank += PlaceRank();
+            DocRank += TagRank();
+            return DocRank;
+        }
+
+        public double PlaceRank()
+        {
+            double rank = 0;
+            foreach (QueryTerm q in _Query)
+            {
+                if (q.AppearsInDoc(_doc.DocumentNumber))
+                {
+                    rank += 1 - (1 / ((_doc.Length / q.FirstAppearens(_doc.DocumentNumber))));
+                }
+            }
+            return rank;
+        }
+
+        public double TagRank()
+        {
+            double rank = 0;
+            foreach (QueryTerm q in _Query)
+            {
+                rank += q.MaxWight(_doc.DocumentNumber);
+            }
+            return (rank / (9 * _Query.Count));
+        }
     }
 }

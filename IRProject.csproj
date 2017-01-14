@@ -57,19 +57,21 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Term\DictionaryTerm.cs" />
-    <Compile Include="Document.cs" />
-    <Compile Include="Indexer.cs" />
     <Compile Include="IRSettings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>IRSettings.settings</DependentUpon>
     </Compile>
+    <Compile Include="Ranker\BM25.cs" />
+    <Compile Include="Ranker\Jaccard.cs" />
+    <Compile Include="Ranker\Ranker.cs" />
+    <Compile Include="Term\DictionaryTerm.cs" />
+    <Compile Include="Document.cs" />
+    <Compile Include="Indexer.cs" />
     <Compile Include="Parse.cs" />
     <Compile Include="Term\ParsedTerm.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Term\QueryTerm.cs" />
-    <Compile Include="Ranker.cs" />
     <Compile Include="ReadFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Searcher.cs" />

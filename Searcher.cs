@@ -14,7 +14,7 @@ namespace IRProject
         Dictionary<string, Document> m_documents;
         Dictionary<string,List<string>> m_docInLanglanguages;
         Parse m_parser;
-        Ranker m_ranker = new Ranker();
+        Ranker m_ranker;
         string m_postingPath;
         bool m_loaded;
         public bool Loaded { get { return m_loaded; } }
