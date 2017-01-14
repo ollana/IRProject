@@ -7,11 +7,11 @@ namespace IRProject
     {
         public Term Term { get { return m_term; }  }
         public int Count { get { return m_count; } }
-        public Dictionary<string, List<Tuple<int, int>>> Documents { get { return m_termDocuments; } }
 
         Term m_term;
         int m_count;
-        Dictionary<string,List<Tuple <int, int>>> m_termDocuments;
+        //document-first location, max wight, number of appearens
+        Dictionary<string,Tuple <int, int,int>> m_termDocuments;
 
         /// <summary>
         /// constractor;
@@ -23,21 +23,16 @@ namespace IRProject
         {
             m_term = term;
             m_count = count;
-            m_termDocuments = new Dictionary<string, List<Tuple<int, int>>>();
+            m_termDocuments = new Dictionary<string,Tuple<int,int,int>>();
             string[] docs = postingData.Split('|');
             foreach (string doc in docs)
             {
-                List<Tuple<int, int>> locationsWigths = new List<Tuple<int, int>>();
                 string[] appearns = doc.Split(' ');
                 string docNum = appearns[0];
-                for(int i=1;i<appearns.Length;i++)
-                {
-                    string[] split = appearns[i].Split(',');
-                    int location =Convert.ToInt32(split[0]);
-                    int weight=Convert.ToInt32(split[1]);
-                    locationsWigths.Add(new Tuple<int, int>(location, weight));
-                }
-                m_termDocuments.Add(docNum, locationsWigths);
+                int location =Convert.ToInt32(appearns[1]);
+                int wight=Convert.ToInt32(appearns[2]);
+                int appearens= Convert.ToInt32(appearns[3]);
+                m_termDocuments.Add(docNum, new Tuple<int,int,int>(location,wight, appearens));
             }
 
         }
@@ -60,7 +55,7 @@ namespace IRProject
         public int NumberOfAppearance(string docNum)
         {
             if (AppearsInDoc(docNum))
-                return m_termDocuments[docNum].Count;
+                return m_termDocuments[docNum].Item3;
             throw new Exception("Term not appears in the given Document");
         }
 
@@ -73,15 +68,21 @@ namespace IRProject
         {
             if (AppearsInDoc(docNum))
             {
-                return m_termDocuments[docNum].Count;
+                return m_termDocuments[docNum].Item2;
             }
             throw new Exception("Term not appears in the given Document");
 
         }
+        /// <summary>
+        /// first appearens of the term in document
+        /// </summary>
+        /// <param name="docNum">document number</param>
+        /// <returns> first appearens</returns>
         public int FirstAppearens(string docNum)
         {
             if (AppearsInDoc(docNum))
             {
+                return m_termDocuments[docNum].Item3;
             }
 
             throw new Exception("Term not appears in the given Document");

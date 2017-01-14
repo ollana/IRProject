@@ -212,7 +212,27 @@ namespace IRProject
                                 tf += doc.Split(' ').Length - 1;
                             numOfUniqueTerms++;
                             dictionary.WriteLine(term + "|" + tf + "|" + df);
-                            posting.WriteLine(spliteLine[1]);
+                            string postingline = "";
+                            foreach (string d in docs)
+                            {
+                                string[] appearns = d.Split(' ');
+                                string docNum = appearns[0];
+                                string[] split = appearns[1].Split(',');
+                                //first location in doc
+                                string location = split[0];
+                                int maxWight= Convert.ToInt32(split[1]);
+                                int appearens = 1;
+                                //max wight in document
+                                for (int i = 2; i < appearns.Length; i++)
+                                {
+                                    split = appearns[i].Split(',');
+                                    maxWight = Math.Max(maxWight ,Convert.ToInt32(split[1]));
+                                    appearens++;
+                                }
+                                postingline += docNum + " " + location + " " + maxWight +" " +appearens +"|";
+                            }
+                            posting.WriteLine(postingline);
+
                         }
                     }
                 }
