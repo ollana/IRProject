@@ -250,23 +250,25 @@ namespace IRProject_GUI
                 MessageBox.Show("Destination path could not be found", "path not found", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            string dictionaryPath, pairsFilePath,documentsDataPath;
+            string dictionaryPath, pairsFilePath,documentsDataPath,postingPath;
             if (Stemming)
             {
                 dictionaryPath = Destination + "\\" + UISettings.Default.DictionaryWithStemming;
-                documentsDataPath = destination + "\\" + UISettings.Default.DocumentsWithStemming;
+                documentsDataPath = Destination + "\\" + UISettings.Default.DocumentsWithStemming;
+                postingPath = Destination + "\\" + UISettings.Default.PostingWithStemming;
             }
             else
             {
                 dictionaryPath = Destination + "\\" + UISettings.Default.DictionaryWithoutStemming;
-                documentsDataPath = destination + "\\" + UISettings.Default.DocumentsWithoutStemming;
+                documentsDataPath = Destination + "\\" + UISettings.Default.DocumentsWithoutStemming;
+                postingPath = Destination + "\\" + UISettings.Default.PostingWithStemming;
 
             }
             pairsFilePath = Destination + "\\Pairs-WithoutStemming";
 
-            if (System.IO.File.Exists(dictionaryPath)&& System.IO.File.Exists(pairsFilePath)&& System.IO.File.Exists(documentsDataPath))
+            if (System.IO.File.Exists(dictionaryPath)&& System.IO.File.Exists(pairsFilePath)&& System.IO.File.Exists(documentsDataPath)&& System.IO.File.Exists(postingPath))
             {
-                m_searcher.LoadDictionaries(dictionaryPath, pairsFilePath, documentsDataPath,m_langueges);   
+                m_searcher.LoadDictionaries(dictionaryPath, pairsFilePath, documentsDataPath, postingPath,m_langueges);   
                 Dictionary1 =  new Dictionary<string, Tuple<string, string>>();
 
                 using (System.IO.StreamReader sr = new System.IO.StreamReader(dictionaryPath))
@@ -293,6 +295,8 @@ namespace IRProject_GUI
                 MessageBox.Show("could not find Paurs fil ine path:\n" + pairsFilePath, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             else if (System.IO.File.Exists(documentsDataPath))
                 MessageBox.Show("could not find Documents file in path:\n" + dictionaryPath, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            else if (System.IO.File.Exists(postingPath))
+                MessageBox.Show("could not find Posting file in path:\n" + dictionaryPath, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 
             Display_dic.IsEnabled = true;
         }

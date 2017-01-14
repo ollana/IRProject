@@ -9,11 +9,16 @@ namespace IRProject
 {
     public class Searcher
     { 
-         Dictionary<string, Term> m_dictionary;
-         Dictionary<string, List<string>> m_pairs;
+        Dictionary<string, Term> m_dictionary;
+        Dictionary<string, List<string>> m_pairs;
         Dictionary<string, Document> m_documents;
-         Dictionary<string,List<string>> m_docInLanglanguages;
+        Dictionary<string,List<string>> m_docInLanglanguages;
         Parse m_parser;
+        Ranker m_ranker = new Ranker();
+        string m_postingPath;
+        bool m_loaded;
+        public bool Loaded { get { return m_loaded; } }
+
 
         /// <summary>
         /// constractor
@@ -25,6 +30,8 @@ namespace IRProject
             m_parser = new Parse(docPath);
             m_documents = new Dictionary<string, Document>();
             m_docInLanglanguages = new Dictionary<string, List<string>>();
+            m_ranker = new Ranker();
+            m_loaded = false;
         }
         /// <summary>
         /// returns list of 5 top options to suggest
@@ -33,48 +40,102 @@ namespace IRProject
         /// <returns>list of suggestion words</returns>
         public List<string> AutoComplete(string word)
         {
-            List<string> complete = new List<string>();
-            if (m_pairs.ContainsKey(word))
-                complete = m_pairs[word];
-            return complete;
+            if (m_loaded)
+            {
+                List<string> complete = new List<string>();
+                if (m_pairs.ContainsKey(word))
+                    complete = m_pairs[word];
+                return complete;
+            }
+            else throw new Exception("dictionary not loaded");
         }
 
         /// <summary>
         /// returns the top 50 documents matchimg a given query ranked by relevance
         /// </summary>
         /// <param name="query"><query/param>
+        /// <param name="languages"><languages/param> 
         /// <returns>list of top 50 documents</returns>
-         public List<string> Search(string query, List<string> langlanguages)
+        public List<string> Search(string query, List<string> languages)
         {
-            List<string> relevant_docs = new List<string>();
-            List<string> parsedTerms = m_parser.ParseQuery(query);
-            List<Tuple<Term, int>> termsInQuery = new List<Tuple<Term, int>>();
-            List<string> termsAdded = new List<string>();
-            //for each term in the query check if it appears in the dictionary, if so count 
-            foreach (string t in parsedTerms)
+            if (m_loaded)
             {
-                if (m_dictionary.ContainsKey(t)&& !termsAdded.Contains(t))
+                List<string> relevant_docs = new List<string>();
+                //list of terms in query
+                List<QueryTerm> termsInQuery = FindQueryTerms(query);
+                //list of documents to rank
+                List<Document> docToRank = FindDocumentsToRank(languages);
+                //rate each document
+                foreach (Document d in docToRank)
                 {
-                    termsInQuery.Add(new Tuple<Term, int>(m_dictionary[t], parsedTerms.Count(item => item == t)));
-                    termsAdded.Add(t);
+
+                    m_ranker.Rank(termsInQuery, d);
                 }
-                
+
+
+
+
+
+
+                return relevant_docs;
+            }
+            else throw new Exception("Dictionary not loaded");
+        }
+
+        private List<Document> FindDocumentsToRank(List<string> languages)
+        {
+            List<Document> docToRank = new List<Document>();
+            if (!languages.Contains("All"))
+            {
+                foreach (string lan in languages)
+                {
+                    foreach (string d in m_docInLanglanguages[lan])
+                    {
+                        if (!docToRank.Contains(m_documents[d]))
+                            docToRank.Add(m_documents[d]);
+                    }
+                }
+            }
+            else
+            {
+                foreach (var d in m_documents)
+                {
+                    docToRank.Add(d.Value);
+                }
             }
 
-
-
-            //if (File.Exists(path))
-            //{
-            //    //using (StreamReader sr = new StreamReader(path))
-            //    //{
-            //    //    string line = File.ReadLines(path).Skip(14).Take(1).First();
-
-            //    //}
-            //}
-             
-
-            return relevant_docs;
+            return docToRank;
         }
+
+        /// <summary>
+        /// returns a list of the parsed terms in the queary and how many times it appeared
+        /// </summary>
+        /// <param name="query"> query </param>
+        /// <returns>list of the terms and count</returns>
+        private List<QueryTerm> FindQueryTerms(string query)
+        {
+            List<string> parsedTerms = m_parser.ParseQuery(query);
+            List<QueryTerm> termsInQuery = new List<QueryTerm>();
+            List<string> termsAdded = new List<string>();
+            //for each term in the query check if it appears in the dictionary, if so count haw many times it apeear in the query
+            foreach (string t in parsedTerms)
+            {
+                if (m_dictionary.ContainsKey(t) && !termsAdded.Contains(t))
+                {
+                    string line;
+                    using (StreamReader sr = new StreamReader(m_postingPath))
+                    {
+                        line = File.ReadLines(m_postingPath).Skip(14).Take(1).First();
+
+                    }
+                    termsInQuery.Add(new QueryTerm(m_dictionary[t], parsedTerms.Count(item => item == t), line));
+                    termsAdded.Add(t);
+                }
+
+            }
+            return termsInQuery;
+        }
+
         //  public Rank(List<Tuple<string, int>> WordsInQueary,List<Term> terms, Document doc,List<Tuple<int,int>> LocationsAndWaigthInDoc...)
 
         /// <summary>
@@ -83,21 +144,28 @@ namespace IRProject
         /// <param name="dictionaryPath">dictionary file path</param>
         /// <param name="pairsFilePath">pairs file path</param>
         /// <param name="documentsDataPath">documents file path</param>
+        /// <param name="postingPath">posting file path</param>
         /// <param name="langueges">list of langueges</param>
-        public void LoadDictionaries(string dictionaryPath, string pairsFilePath, string documentsDataPath, List<string> langueges)
+        public void LoadDictionaries(string dictionaryPath, string pairsFilePath, string documentsDataPath,string postingPath, List<string> langueges)
         {
             LoadDictionary(dictionaryPath);
             LoadPairs(pairsFilePath);
             LoadDocuments(documentsDataPath);
             LoadDocInLanguege(langueges);
+            m_postingPath = postingPath;
+            m_loaded = true;
 
         }
+        /// <summary>
+        /// reset all data
+        /// </summary>
         public void ResetDictionaries()
         {
             m_dictionary.Clear();
             m_docInLanglanguages.Clear() ;
             m_documents.Clear();
             m_pairs.Clear();
+            m_loaded = false;
         }
 
         /// <summary>
