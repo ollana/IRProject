@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IRProject
 {
@@ -14,7 +12,7 @@ namespace IRProject
         Dictionary<string, Document> m_documents;
         Dictionary<string,List<string>> m_docInLanglanguages;
         Parse m_parser;
-        Ranker m_ranker = new Ranker();
+        Ranker.Ranker m_ranker;
         string m_postingPath;
         bool m_loaded;
         public bool Loaded { get { return m_loaded; } }
@@ -30,7 +28,6 @@ namespace IRProject
             m_parser = new Parse(docPath);
             m_documents = new Dictionary<string, Document>();
             m_docInLanglanguages = new Dictionary<string, List<string>>();
-            m_ranker = new Ranker();
             m_loaded = false;
         }
         /// <summary>

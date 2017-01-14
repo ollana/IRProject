@@ -1,23 +1,25 @@
-﻿using IRProject.Terms;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IRProject.Ranker
 {
     class BM25
     {
         double _k1, _k2, _b, _K;
-            int _ri, _R;
-        public BM25(string query, double k1, double k2, double b, int R, int ri)
+        int _ri, _R;
+        double _avgdl;
+        int _N;
+
+        public BM25( double k1, double k2, double b, int R, int ri)
         {
             _k1 = k1;
             _k2 = k2;
             _b = b;
             _ri = ri;
             _R = R;
+            _N = IRSettings.Default.NumberOfDocuments;
+            _avgdl = IRSettings.Default.AverageDocLength;
+
         }
 
         /// <summary>
@@ -26,13 +28,12 @@ namespace IRProject.Ranker
         /// <param name="Document"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public double Score(Tuple<Document,int> Document, string query, int DocumentFrequency)
+        public double Score(Document d, List<QueryTerm> Query)
         {
-            string[] Q = query.Split(' ');//בעיה... אם הטרם הוא עם רווחים... צריך לבדוק עם הפרסר לפני
             double sum = 0;
-            foreach (var term in Q)
+            foreach (QueryTerm q in Query)
             {
-                //sum += ScoreOne(Document.Item1.DocumentLength,_AverageDocLength,DocumentFrequency,_NumberOfDocuments,Document.Item2
+                sum += ScoreOne(d.Length, q.DocumentFrequency(), q.NumberOfAppearance(d.DocumentNumber), q.Count);
             }
             return sum;
         }
@@ -43,7 +44,7 @@ namespace IRProject.Ranker
         /// <param name="Document"></param>
         /// <param name="term"></param>
         /// <returns></returns>
-        public double ScoreOne(double _dl, double _avgdl, double _ni, double _N, double _fi, double _qfi)
+        public double ScoreOne(double _dl, double _ni, double _fi, double _qfi)
         {
             _K = _k1 * ((_b * (_dl /_avgdl)) + (1 - _b));
             double toLog = ((_ri + 0.5) / (_R - _ri + 0.5)) / ((_ni - _ri + 0.5) / (_N - _ni - _R + _ri + 0.5));

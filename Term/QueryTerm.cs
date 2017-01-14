@@ -38,6 +38,14 @@ namespace IRProject
         }
 
         /// <summary>
+        /// returns Df of the term
+        /// </summary>
+        /// <returns></returns>
+        public int DocumentFrequency()
+        {
+            return m_termDocuments.Count;
+        }
+        /// <summary>
         /// check if the term apeears in this document
         /// </summary>
         /// <param name="docNum">document number</param>
