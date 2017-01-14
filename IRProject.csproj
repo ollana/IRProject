@@ -57,6 +57,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Term\DictionaryTerm.cs" />
     <Compile Include="Document.cs" />
     <Compile Include="Indexer.cs" />
     <Compile Include="IRSettings.Designer.cs">
@@ -65,14 +66,15 @@
       <DependentUpon>IRSettings.settings</DependentUpon>
     </Compile>
     <Compile Include="Parse.cs" />
+    <Compile Include="Term\ParsedTerm.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="QueryTerm.cs" />
+    <Compile Include="Term\QueryTerm.cs" />
     <Compile Include="Ranker.cs" />
     <Compile Include="ReadFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Searcher.cs" />
     <Compile Include="Stemmer.cs" />
-    <Compile Include="Term.cs" />
+    <Compile Include="Term\Term.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

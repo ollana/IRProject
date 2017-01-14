@@ -35,9 +35,9 @@ namespace IRProject
         /// </summary>
         /// <param name="TermsList"> term list</param>
         ///<param Pairs="terms"> list of pairs</param>
-        public void Index(List<Term> TermsList, List<string> Pairs)
+        public void Index(List<ParsedTerm> TermsList, List<string> Pairs)
         {
-            Term[] TermsArray = TermsList.OrderBy(t => t.Value, StringComparer.Ordinal).ToArray();
+            ParsedTerm[] TermsArray = TermsList.OrderBy(t => t.Value, StringComparer.Ordinal).ToArray();
             Pairs = Pairs.OrderBy(t => t, StringComparer.Ordinal).ToList();
 
             Pairs = MargePairs(Pairs);
@@ -292,11 +292,11 @@ namespace IRProject
         /// </summary>
         /// <param name="SortedTerms">array of terms sorted lexicographic with repeats</param>
         /// <returns>array of terms sorted lexicographic with no repeats</returns>
-        private List<string> MargeTerms(Term[] SortedTerms)
+        private List<string> MargeTerms(ParsedTerm[] SortedTerms)
         {
             List<string> margedTerms = new List<string>();
             int TermIndex = 0;
-            Term CurrentTerm = SortedTerms[0];
+            ParsedTerm CurrentTerm = SortedTerms[0];
 
             START:
             string DocNum_Location_Weight = CurrentTerm.DocNum + " " + CurrentTerm.Location + "," + CurrentTerm.Weight;
@@ -305,7 +305,7 @@ namespace IRProject
 
             for (TermIndex++; TermIndex < SortedTerms.Length; TermIndex++)
             {
-                Term t = SortedTerms[TermIndex];
+                ParsedTerm t = SortedTerms[TermIndex];
                 if (t.Value == CurrentTermValue)
                 {
                     if (LastDocNum == t.DocNum)

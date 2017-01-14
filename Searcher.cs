@@ -9,7 +9,7 @@ namespace IRProject
 {
     public class Searcher
     { 
-        Dictionary<string, Term> m_dictionary;
+        Dictionary<string, DictionaryTerm> m_dictionary;
         Dictionary<string, List<string>> m_pairs;
         Dictionary<string, Document> m_documents;
         Dictionary<string,List<string>> m_docInLanglanguages;
@@ -25,7 +25,7 @@ namespace IRProject
         /// </summary>
         public Searcher(string docPath)
         {
-            m_dictionary = new Dictionary<string, Term>();
+            m_dictionary = new Dictionary<string, DictionaryTerm>();
             m_pairs = new Dictionary<string, List<string>>();
             m_parser = new Parse(docPath);
             m_documents = new Dictionary<string, Document>();
@@ -95,6 +95,11 @@ namespace IRProject
             return topdocs;
         }
 
+        /// <summary>
+        /// documents in the given langueges
+        /// </summary>
+        /// <param name="languages">langueges</param>
+        /// <returns> list of documents according to the given langueges </returns>
         private List<Document> FindDocumentsToRank(List<string> languages)
         {
             List<Document> docToRank = new List<Document>();
@@ -111,6 +116,7 @@ namespace IRProject
             }
             else
             {
+                //add all documents
                 foreach (var d in m_documents)
                 {
                     docToRank.Add(d.Value);
@@ -150,7 +156,6 @@ namespace IRProject
             return termsInQuery;
         }
 
-        //  public Rank(List<Tuple<string, int>> WordsInQueary,List<Term> terms, Document doc,List<Tuple<int,int>> LocationsAndWaigthInDoc...)
 
         /// <summary>
         /// load all data
@@ -221,7 +226,7 @@ namespace IRProject
                     if (line != string.Empty)
                     {
                         string[] split = line.Split('|');
-                        m_dictionary.Add(split[0], new Term(split[0], Convert.ToInt32(split[1]), Convert.ToInt32(split[2]), lineNum));
+                        m_dictionary.Add(split[0], new DictionaryTerm(split[0], Convert.ToInt32(split[1]), Convert.ToInt32(split[2]), lineNum));
                     }
                     line = sr.ReadLine();
                     lineNum++;
@@ -275,13 +280,14 @@ namespace IRProject
             using (System.IO.StreamReader sr = new System.IO.StreamReader(path))
             {
                 string line = sr.ReadLine();
-
+                int lineNum = 0;
                 while (line != null)
                 {
                     if (line != string.Empty)
                     {
                         string[] split = line.Split('|');
-                        m_documents.Add(split[0], new Document(line));
+                        m_documents.Add(split[0], new Document(line,lineNum));
+                        lineNum++;
                     }
                     line = sr.ReadLine();
                 }

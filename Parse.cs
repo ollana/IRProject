@@ -25,7 +25,7 @@ namespace IRProject
         int UniqueTermsInDoc;
         int maxTFInDoc;
         Dictionary<string, int> termsInDoc;
-        List<Term> terms;
+        List<ParsedTerm> terms;
         Stemmer stemmer;
         HashSet<string> stopWords;
         Indexer indexer;
@@ -39,7 +39,7 @@ namespace IRProject
         /// <param name="DocumentPath">path of the stop words file</param>
         public Parse(string DocumentPath)
         {
-            terms = new List<Term>();
+            terms = new List<ParsedTerm>();
             stemmer = new Stemmer();
             stopWords = new HashSet<string>();
             indexer = new Indexer();
@@ -185,7 +185,7 @@ namespace IRProject
         {
             if (termToParse.Length > 0)
             {
-                Term term = new Term(termToParse, docNum);
+                ParsedTerm term = new ParsedTerm(termToParse, docNum);
                 //if the term is a fraction or number followed by a fraction 
                 checkFraction(term);
                 checkNumber(term);
@@ -210,7 +210,7 @@ namespace IRProject
         /// if the term is a fraction- save it as a number 
         /// </summary>
         /// <param name="term"> term </param>
-        private void checkFraction(Term term)
+        private void checkFraction(ParsedTerm term)
         {
             //if the term is a number- check if the next word is a fraction- if so combine them
             if (term.IsNumeric && index < TermsToSort.Length - 1 && isWordFraction(TermsToSort[index + 1]))
@@ -232,7 +232,7 @@ namespace IRProject
         /// check if its a part of a date
         /// </summary>
         /// <param name="term"> term</param>
-        private void checkNumber(Term term)
+        private void checkNumber(ParsedTerm term)
         {
             if (term.IsNumeric)
             {
@@ -255,7 +255,7 @@ namespace IRProject
         ///  check if the term is precentage (number ends with %)
         /// </summary>
         /// <param name="term"> term</param>
-        private void checkPrecentage(Term term)
+        private void checkPrecentage(ParsedTerm term)
         {
             //check if percentage
             if (term.Value[term.Value.Length - 1] == '%')
@@ -276,7 +276,7 @@ namespace IRProject
         /// check if the term is a price(number starting with $)- if so add "dollars" to it,
         /// </summary>
         /// <param name="term"> term</param>
-        private void checkPrice(Term term)
+        private void checkPrice(ParsedTerm term)
         {
             if (term.Value[0] == '$')
             {
@@ -300,7 +300,7 @@ namespace IRProject
         /// check if the term is a part of a date (if the term is name of a month or number ends with "th")
         /// </summary>
         /// <param name="term">term</param>
-        private void checkDate(Term term)
+        private void checkDate(ParsedTerm term)
         {
             string month = monthOfTerm(term.Value);
             //if the term is a month check if its followed a date if so marge it to one date term
@@ -325,12 +325,12 @@ namespace IRProject
         /// check if the term is a range in the pattern (between number and number)
         /// </summary>
         /// <param name="term">term</param>
-        private void checkBetweenRange(Term term)
+        private void checkBetweenRange(ParsedTerm term)
         {
             int initialindex = index;
             if (term.Value == "between" && index < TermsToSort.Length - 3)
             {
-                Term word2 = new Term(TermsToSort[index + 1], docNum);
+                ParsedTerm word2 = new ParsedTerm(TermsToSort[index + 1], docNum);
                 index++;
                 checkFraction(word2);
                 if (word2.IsNumeric)
@@ -342,7 +342,7 @@ namespace IRProject
                         index++;
                         if (index < TermsToSort.Length - 1)
                         {
-                            Term word4 = new Term(TermsToSort[index + 1], docNum);
+                            ParsedTerm word4 = new ParsedTerm(TermsToSort[index + 1], docNum);
                             index++;
                             checkFraction(word4);
                             if (word4.IsNumeric)
@@ -369,7 +369,7 @@ namespace IRProject
         /// </summary>
         /// <param name="term">term</param>
         /// <returns>true if term add to the term list</returns>
-        private void addSimpleTerm(Term term)
+        private void addSimpleTerm(ParsedTerm term)
         {
             if (!stopWords.Contains(term.Value))
             {
@@ -385,7 +385,7 @@ namespace IRProject
         /// if term apears for the first time add one to the number of unique terms in the document, if its apers again reduce one.
         /// </summary>
         /// <param name="term">term </param>
-        private void addTermToTermList(Term term)
+        private void addTermToTermList(ParsedTerm term)
         {
             if (ParseType==TYPE.Corpus && term.Value.Length > 0)
             {
@@ -420,7 +420,7 @@ namespace IRProject
         /// <summary>
         /// if month followed by a date(day,year or year only), marge the term to a date and save it
         /// </summary>
-        private void makeDateStartWithMonth(string month, Term term)
+        private void makeDateStartWithMonth(string month, ParsedTerm term)
         {
             if (index < TermsToSort.Length - 1)
             {
@@ -513,14 +513,14 @@ namespace IRProject
         /// <param name="phrase"> term array</param>
         private void RangePhraseTerm(string[] phrase)
         {
-            Term phraseTerm;
+            ParsedTerm phraseTerm;
             string rangePhrase = "";
             switch (phrase.Length)
             {
                 case (2):
                     for (int i = 0; i < 2; i++)
                     {
-                        Term term = new Term(phrase[i], docNum);
+                        ParsedTerm term = new ParsedTerm(phrase[i], docNum);
                         checkFraction(term);
                         if (term.IsNumeric)
                             //convert to "Million" expression if nessesery
@@ -531,7 +531,7 @@ namespace IRProject
                         if (i < phrase.Length - 1)
                             rangePhrase += "-";
                     }
-                    phraseTerm = new Term(rangePhrase, docNum);
+                    phraseTerm = new ParsedTerm(rangePhrase, docNum);
                     addTermToTermList(phraseTerm);
                     break;
                 case (3):
@@ -551,7 +551,7 @@ namespace IRProject
                             if (i < phrase.Length - 1)
                                 rangePhrase += "-";
                         }
-                        phraseTerm = new Term(rangePhrase, docNum);
+                        phraseTerm = new ParsedTerm(rangePhrase, docNum);
                         addTermToTermList(phraseTerm);
                     }
                     //if one of the terms is a number its not the patern and we will check every term seperetly
@@ -578,7 +578,7 @@ namespace IRProject
         /// check if the next term is part of the same stracture (price/ precent)
         /// </summary>
         /// <param name="term"> term </param>
-        private void checkNextTerm(Term term)
+        private void checkNextTerm(ParsedTerm term)
         {
             if (index < TermsToSort.Length - 1)
             {
@@ -659,7 +659,7 @@ namespace IRProject
         /// <summary>
         /// given a two digit number, check if it followd by a month- if so make it a date
         /// </summary>
-        private void checkDateTerm(Term term)
+        private void checkDateTerm(ParsedTerm term)
         {
             if (index < TermsToSort.Length - 1)
             {
@@ -675,7 +675,7 @@ namespace IRProject
         /// make a date(when it starts with day followed a month), check for year
         /// </summary>
         /// <param name="month"> month</param>
-        private void makeDateStartWithDay(string month, Term term)
+        private void makeDateStartWithDay(string month, ParsedTerm term)
         {
             string year = "";
             string day = term.Value;
@@ -707,7 +707,7 @@ namespace IRProject
         /// for numbers over million , or numbers followed the words:million, billion, trillion-convert to millions and use the pattern (number M)
         /// </summary>
         /// <param name="term">number</param>
-        private void ConvertToMillion(Term term)
+        private void ConvertToMillion(ParsedTerm term)
         {
             bool millionAdded = false;
             double number = Convert.ToDouble(term.Value);
@@ -749,7 +749,7 @@ namespace IRProject
         /// for numbers with the measure units: kg,g use pattern (number kg)
         /// </summary>
         /// <param name="term">number</param>
-        private void ConvertToMeasureUnits(Term term)
+        private void ConvertToMeasureUnits(ParsedTerm term)
         {
             if (isTermNumber(term.Value.Replace(" m", "")))
             {

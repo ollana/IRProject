@@ -222,7 +222,7 @@ namespace IRProject
                         case "</DOC>":
                             if (tempText != string.Empty)    
                                     docText.Add(new Tuple<string, int>(tempText.ToLower().Trim(), 0));
-                            Document doc=new Document(docNo, docDate, docTitle, docArtType, docLang);
+                            Document doc=new Document(docNo, docDate, docLang);
                             parser.ParseDoc(docText, doc);
                             goto emptyStrings;
                         default:
