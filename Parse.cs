@@ -86,9 +86,9 @@ namespace IRProject
                     previousTerm = null;
                 }
             }
-            doc.DocumentLength = location--;
-            doc.DocumentNumberUniqueWords = UniqueTermsInDoc;
-            doc.DocumentMaxTF = maxTFInDoc;
+            doc.Length = location--;
+            doc.NumberUniqueWords = UniqueTermsInDoc;
+            doc.MaxTF = maxTFInDoc;
             l_documents.Add(doc);
             //after parsing NUMBER_OF_DUCUMENTS_TO_INDEX documents, send the term list to the indexer and start a new list
             if (terms.Count >= NUMBER_OF_Terms_TO_INDEX)

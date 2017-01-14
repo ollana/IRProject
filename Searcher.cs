@@ -60,7 +60,6 @@ namespace IRProject
         {
             if (m_loaded)
             {
-                List<string> relevant_docs = new List<string>();
                 //list of terms in query
                 List<QueryTerm> termsInQuery = FindQueryTerms(query);
                 //list of documents to rank
@@ -69,17 +68,31 @@ namespace IRProject
                 foreach (Document d in docToRank)
                 {
 
-                    m_ranker.Rank(termsInQuery, d);
+                    d.Rank=m_ranker.Rank(termsInQuery, d);
                 }
 
-
-
-
-
-
-                return relevant_docs;
+                return FindTop50Docs(docToRank);
             }
             else throw new Exception("Dictionary not loaded");
+        }
+        /// <summary>
+        /// find and return top 50 ranked documents
+        /// </summary>
+        /// <param name="docToRank">documents</param>
+        /// <returns>list of top 50 docs</returns>
+        private List<string> FindTop50Docs(List<Document> docToRank)
+        {
+            List<string> topdocs = new List<string>();
+            List<Document> rankedDoc = docToRank.OrderBy(p => p.Rank).ToList<Document>();
+            rankedDoc.Reverse();
+            foreach (Document d in rankedDoc)
+            {
+                if (topdocs.Count < 50)
+                    topdocs.Add(d.DocumentNumber);
+                else
+                    break;
+            }
+            return topdocs;
         }
 
         private List<Document> FindDocumentsToRank(List<string> languages)
@@ -123,9 +136,10 @@ namespace IRProject
                 if (m_dictionary.ContainsKey(t) && !termsAdded.Contains(t))
                 {
                     string line;
+                    //take the term information from the posting file
                     using (StreamReader sr = new StreamReader(m_postingPath))
                     {
-                        line = File.ReadLines(m_postingPath).Skip(14).Take(1).First();
+                        line = File.ReadLines(m_postingPath).Skip(m_dictionary[t].LineNumber).Take(1).First();
 
                     }
                     termsInQuery.Add(new QueryTerm(m_dictionary[t], parsedTerms.Count(item => item == t), line));
@@ -185,8 +199,8 @@ namespace IRProject
 
             foreach (var d in m_documents)
             {
-                if(langueges.Contains(d.Value.DocumentLanguage))
-                    m_docInLanglanguages[d.Value.DocumentLanguage].Add(d.Key);
+                if(langueges.Contains(d.Value.Language))
+                    m_docInLanglanguages[d.Value.Language].Add(d.Key);
             }
         }
 

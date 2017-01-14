@@ -10,9 +10,9 @@ namespace IRProject
     class Document
     {
 
-        string DocNumber, Titel, ArticleType, Language,DocDate;
+        string m_DocNumber, Titel, ArticleType, m_language,m_DocDate;
         int max_tf, numOfUniqueWord,length;
-
+        double m_rank;
         /// <summary>
         /// constractor, constract a document and save his attributes
         /// </summary>
@@ -24,21 +24,21 @@ namespace IRProject
         public Document(string docNo, string docDate, string docTitle, string docArtType, string docLang)
         {
             length = 0;
-            DocNumber = docNo;
+            m_DocNumber = docNo;
             string[] date = docDate.Split(' ');
-            DocDate = docDate;
+            m_DocDate = docDate;
 
             Titel = docTitle;
             ArticleType = docArtType;
-            Language = docLang;
+            m_language = docLang;
         }
         public Document(string docInfo)
         {
             // DocNumber + "|" + Language + "|" + DocDate + "|" + max_tf + "|" + numOfUniqueWord + "|" + length;
             string[] info = docInfo.Split('|');
-            DocNumber = info[0];
-            Language = info[1];
-            DocDate = info[2];
+            m_DocNumber = info[0];
+            m_language = info[1];
+            m_DocDate = info[2];
             max_tf = Convert.ToInt32( info[3]);
             numOfUniqueWord = Convert.ToInt32(info[4]);
             length = Convert.ToInt32(info[5]);
@@ -47,21 +47,24 @@ namespace IRProject
         /// <summary>
         /// the documenr number
         /// </summary>
-        public string DocumentNumber { get { return DocNumber; }  }
+        public string DocumentNumber { get { return m_DocNumber; }  }
         /// <summary>
         /// the documenr length
         /// </summary>
-        public int DocumentLength { set { length = value; } get { return length; } }
+        public int Length { set { length = value; } get { return length; } }
         /// <summary>
         /// the documenr number of unique words
         /// </summary>
-        public int DocumentNumberUniqueWords { set { numOfUniqueWord = value; } get { return numOfUniqueWord; } }
+        public int NumberUniqueWords { set { numOfUniqueWord = value; } get { return numOfUniqueWord; } }
         /// <summary>
         /// the documenr max term frequency
         /// </summary>
-        public int DocumentMaxTF { set { max_tf = value; } get { return max_tf; } }
+        public int MaxTF { set { max_tf = value; } get { return max_tf; } }
 
-        public string DocumentLanguage { get { return Language; } }
+        public string Language { get { return m_language; } }
+
+        public double Rank { set { m_rank = value; } get { return m_rank; } }
+
 
 
         /// <summary>
@@ -70,7 +73,7 @@ namespace IRProject
         /// <returns> string describes the document</returns>
         public override string ToString()
         {
-            return DocNumber + "|" + Language + "|" + DocDate + "|" + max_tf + "|" + numOfUniqueWord + "|" + length;
+            return m_DocNumber + "|" + m_language + "|" + m_DocDate + "|" + max_tf + "|" + numOfUniqueWord + "|" + length;
         } 
     }
 

@@ -5,7 +5,7 @@ namespace IRProject
 {
      class Ranker
     {
-        public void Rank(List<QueryTerm> termsInQuery, Document doc)
+        public double Rank(List<QueryTerm> termsInQuery, Document doc)
         {
             throw new NotImplementedException();
         }
