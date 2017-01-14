@@ -37,17 +37,14 @@ namespace IRProject
     public class ProgramUI
     {
         public ProgramUI() { }
-        public object[] MainUI(string corpus, string destination, bool stemming)
+        public object[] MainUI()
         {
             object[] obj;
-            IRSettings.Default.Corpus = corpus;
-            IRSettings.Default.Destination = destination;
-            IRSettings.Default.Stemming = stemming;
             System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
             stopwatch.Start();
            // try
            // {
-                ReadFile rf = new ReadFile(IRSettings.Default.Corpus);   
+                ReadFile rf = new ReadFile();   
                 obj = new object [] {(double)stopwatch.ElapsedMilliseconds / 60000, rf.GetNumberOfDocuments() , rf.GetNumOfUniqeTerms()};
                 stopwatch.Stop();
                 return obj;
@@ -57,5 +54,22 @@ namespace IRProject
                 //  }
 
         }
+
+        public bool Stemming
+        {
+            set { IRSettings.Default.Stemming = value; }
+
+        }
+        public string CorpusDestination
+        {
+            set { IRSettings.Default.Corpus = value; }
+
+        }
+        public string DictionaryDestination
+        {
+            set { IRSettings.Default.Destination = value; }
+
+        }
+
     }
 }

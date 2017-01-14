@@ -32,6 +32,18 @@ namespace IRProject
             ArticleType = docArtType;
             Language = docLang;
         }
+        public Document(string docInfo)
+        {
+            // DocNumber + "|" + Language + "|" + DocDate + "|" + max_tf + "|" + numOfUniqueWord + "|" + length;
+            string[] info = docInfo.Split('|');
+            DocNumber = info[0];
+            Language = info[1];
+            DocDate = info[2];
+            max_tf = Convert.ToInt32( info[3]);
+            numOfUniqueWord = Convert.ToInt32(info[4]);
+            length = Convert.ToInt32(info[5]);
+
+        }
         /// <summary>
         /// the documenr number
         /// </summary>
@@ -39,15 +51,18 @@ namespace IRProject
         /// <summary>
         /// the documenr length
         /// </summary>
-        public int DocumentLength { set { length = value; } }
+        public int DocumentLength { set { length = value; } get { return length; } }
         /// <summary>
         /// the documenr number of unique words
         /// </summary>
-        public int DocumentNumberUniqueWords { set { numOfUniqueWord = value; } }
+        public int DocumentNumberUniqueWords { set { numOfUniqueWord = value; } get { return numOfUniqueWord; } }
         /// <summary>
         /// the documenr max term frequency
         /// </summary>
-        public int DocumentMaxTF { set { max_tf = value; } }
+        public int DocumentMaxTF { set { max_tf = value; } get { return max_tf; } }
+
+        public string DocumentLanguage { get { return Language; } }
+
 
         /// <summary>
         /// discription of the document the document

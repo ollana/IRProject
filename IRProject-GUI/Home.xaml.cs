@@ -18,12 +18,11 @@ namespace IRProject_GUI
     public partial class Home : UserControl
     {
         public Dictionary<string, Tuple<string, string>> Dictionary1; 
-        public string Corpus { get { return corpus_path.Text; } set { corpus = value; corpus_path.Text = value; } }
-        public string Destination { get { return save_path.Text; } set { destination = value; save_path.Text = value; } }
-        public bool Stemming { get { return stemming.IsChecked.Value; } set { stemm = value; } }
+        public string Corpus { get { return corpus_path.Text; } set { corpus = value; corpus_path.Text = value; m_program.CorpusDestination = value;} }
+        public string Destination { get { return save_path.Text; } set { destination = value; save_path.Text = value; m_program.DictionaryDestination = value; } }
+        public bool Stemming { get { return stemming.IsChecked.Value; } set { stemm = value; m_program.Stemming = value; } }
 
 
-        public
         //for stop watch
         DispatcherTimer dt = new DispatcherTimer();
         Stopwatch stopWatch = new Stopwatch();
@@ -35,7 +34,9 @@ namespace IRProject_GUI
         bool stemm;
         object[] obj;
         TaskScheduler _ui;
+        IRProject.ProgramUI m_program;
         Searcher m_searcher;
+        List<string> m_langueges;
 
         /// <summary>
         /// constractor
@@ -43,10 +44,12 @@ namespace IRProject_GUI
         public Home()
         {
             InitializeComponent();
+            m_program= new IRProject.ProgramUI();
             Corpus = System.IO.Directory.GetCurrentDirectory();
             Destination = System.IO.Directory.GetCurrentDirectory();
             stemming.IsChecked = true;
             Stemming = true;
+
             no_stemming.IsChecked = false;
             dt.Tick += new EventHandler(dt_Tick);
             dt.Interval = new TimeSpan(0, 0, 0, 0, 1);
@@ -56,9 +59,11 @@ namespace IRProject_GUI
             bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_RunWorkerCompleted);
             string lineOfContents =Properties.Resources.LANGUAGES;
             string[] splitLang = lineOfContents.Split('\n');
+            m_langueges = new List<string>();
             foreach (var line in splitLang)
             {
                 comboBox.Items.Add(line);
+                m_langueges.Add(line);
             }
 
             _ui = TaskScheduler.FromCurrentSynchronizationContext();
@@ -122,8 +127,8 @@ namespace IRProject_GUI
         private void bw_DoWork(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
-            IRProject.ProgramUI pui = new IRProject.ProgramUI();
-            obj = pui.MainUI(corpus, destination, stemm);
+            obj = m_program.MainUI();
+
         }
         /// <summary>
         /// what to do when the work of the woker finished
@@ -210,6 +215,7 @@ namespace IRProject_GUI
             if (result.ToString() == "Yes")
             {
                 Dictionary1 = null;
+                m_searcher.ResetDictionaries();
                 if (!System.IO.Directory.Exists(Destination))
                 {
                     MessageBox.Show("Destination path could not be found", "path not found", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -244,17 +250,26 @@ namespace IRProject_GUI
                 MessageBox.Show("Destination path could not be found", "path not found", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            string path;
+            string dictionaryPath, pairsFilePath,documentsDataPath;
             if (Stemming)
-                path = Destination + "\\" + UISettings.Default.DictionaryWithStemming;
-            else
-                path = Destination + "\\" + UISettings.Default.DictionaryWithoutStemming;
-            if (System.IO.File.Exists(path))
             {
-                m_searcher.LoadDictionary(path);   
+                dictionaryPath = Destination + "\\" + UISettings.Default.DictionaryWithStemming;
+                documentsDataPath = destination + "\\" + UISettings.Default.DocumentsWithStemming;
+            }
+            else
+            {
+                dictionaryPath = Destination + "\\" + UISettings.Default.DictionaryWithoutStemming;
+                documentsDataPath = destination + "\\" + UISettings.Default.DocumentsWithoutStemming;
+
+            }
+            pairsFilePath = Destination + "\\Pairs-WithoutStemming";
+
+            if (System.IO.File.Exists(dictionaryPath)&& System.IO.File.Exists(pairsFilePath)&& System.IO.File.Exists(documentsDataPath))
+            {
+                m_searcher.LoadDictionaries(dictionaryPath, pairsFilePath, documentsDataPath,m_langueges);   
                 Dictionary1 =  new Dictionary<string, Tuple<string, string>>();
 
-                using (System.IO.StreamReader sr = new System.IO.StreamReader(path))
+                using (System.IO.StreamReader sr = new System.IO.StreamReader(dictionaryPath))
                 {
                     string line = sr.ReadLine();
                     int lineNum = 0;
@@ -272,18 +287,12 @@ namespace IRProject_GUI
                 }
                 MessageBox.Show("Dictionary was loaded");
             }
-            else
-                MessageBox.Show("could not find dictionary path:\n" + path,"Error",MessageBoxButton.OK,MessageBoxImage.Error);
-            path = Destination + "\\Pairs-WithoutStemming";
-
-            if (System.IO.File.Exists(path))
-            {
-
-                m_searcher.LoadPairs(path);
-            }
-            else
-                MessageBox.Show("could not find dictionary path:\n" + path, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-           //   m_searcher.Search("wildcat wildcat million wild-cat wildcat 0.1");
+            else if(System.IO.File.Exists(dictionaryPath))
+                MessageBox.Show("could not find dictionary in path:\n" + dictionaryPath,"Error",MessageBoxButton.OK,MessageBoxImage.Error);
+            else if (System.IO.File.Exists(pairsFilePath))
+                MessageBox.Show("could not find Paurs fil ine path:\n" + pairsFilePath, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            else if (System.IO.File.Exists(documentsDataPath))
+                MessageBox.Show("could not find Documents file in path:\n" + dictionaryPath, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 
             Display_dic.IsEnabled = true;
         }

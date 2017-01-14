@@ -23,9 +23,9 @@ namespace IRProject
         /// <summary>
         /// constractor - iterates all files in the given corpus path and send each one to ReadThisFile method.
         /// </summary>
-        /// <param name="path"></param>
-        public ReadFile(string path)
+        public ReadFile()
         {
+            string path = IRSettings.Default.Corpus;
             docText = new List<Tuple<string, int>>();
             docspath = path;
             string[] files = Directory.GetFiles(path);//get all files in the folder
@@ -41,7 +41,7 @@ namespace IRProject
         /// <summary>
         /// returns the number of documents 
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Number Of Documents</returns>
         public int GetNumberOfDocuments()
         {
             return parser.l_documents.Count;
@@ -50,7 +50,7 @@ namespace IRProject
         /// <summary>
         /// returns number of uniqe terms from the parser 
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Num Of Uniqe Terms</returns>
         public int GetNumOfUniqeTerms()
         {
             return parser.GetNumOfUniqeTerms();

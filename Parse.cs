@@ -410,7 +410,7 @@ namespace IRProject
                 previousTerm = term.Value;
 
             }
-            else if(ParseType == TYPE.Corpus)
+            else if(ParseType == TYPE.Query)
             {
                 terms.Add(term);
                 term.Saved = true;
