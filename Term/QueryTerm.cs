@@ -5,10 +5,10 @@ namespace IRProject
 {
      class QueryTerm
     {
-        public Term Term { get { return m_term; }  }
+        public DictionaryTerm Term { get { return m_term; }  }
         public int Count { get { return m_count; } }
 
-        Term m_term;
+        DictionaryTerm m_term;
         int m_count;
         //document-first location, max wight, number of appearens
         Dictionary<string,Tuple <int, int,int>> m_termDocuments;
@@ -19,7 +19,7 @@ namespace IRProject
         /// <param name="term">term </param>
         /// <param name="count">times appeared in query</param>
         /// <param name="postingData">posting information </param>
-        public QueryTerm(Term term, int count, string postingData)
+        public QueryTerm(DictionaryTerm term, int count, string postingData)
         {
             m_term = term;
             m_count = count;
