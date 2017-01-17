@@ -212,7 +212,8 @@ namespace IRProject
                                 tf += doc.Split(' ').Length - 1;
                             numOfUniqueTerms++;
                             dictionary.WriteLine(term + "|" + tf + "|" + df);
-                            string postingline = "";
+                            //string postingline = "";
+                            List<string> postingline = new List<string>();
                             foreach (string d in docs)
                             {
                                 string[] appearns = d.Split(' ');
@@ -229,10 +230,14 @@ namespace IRProject
                                     maxWight = Math.Max(maxWight ,Convert.ToInt32(split[1]));
                                     appearens++;
                                 }
-                                postingline += docNum + " " + location + " " + maxWight +" " +appearens +"|";
+                                postingline.Add( docNum + " " + location + " " + maxWight +" " +appearens +"|");
                             }
-                            posting.WriteLine(postingline);
-
+                            foreach (string p in postingline)
+                            {
+                                posting.Write(p);
+                            }
+                            posting.WriteLine("");
+                            postingline.Clear();
                         }
                     }
                 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using IRProject.Ranker;
 
 namespace IRProject
 {
@@ -29,6 +30,7 @@ namespace IRProject
             m_documents = new Dictionary<string, Document>();
             m_docInLanglanguages = new Dictionary<string, List<string>>();
             m_loaded = false;
+            m_ranker = new Ranker.Ranker();
         }
         /// <summary>
         /// returns list of 5 top options to suggest

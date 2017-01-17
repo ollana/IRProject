@@ -19,3 +19,9 @@ D:\OLLADI\IRProject\obj\x64\Debug\IRProject.csprojResolveAssemblyReference.cache
 D:\ADI\GitHub\IRProject\obj\x64\Debug\IRProject.csprojResolveAssemblyReference.cache
 D:\ADI\GitHub\IRProject\obj\x64\Debug\IRProject.exe
 D:\ADI\GitHub\IRProject\obj\x64\Debug\IRProject.pdb
+C:\Users\Olga\Documents\GitHub\IRProject\bin\x64\Debug\IRProject.exe.config
+C:\Users\Olga\Documents\GitHub\IRProject\bin\x64\Debug\IRProject.exe
+C:\Users\Olga\Documents\GitHub\IRProject\bin\x64\Debug\IRProject.pdb
+C:\Users\Olga\Documents\GitHub\IRProject\obj\x64\Debug\IRProject.csprojResolveAssemblyReference.cache
+C:\Users\Olga\Documents\GitHub\IRProject\obj\x64\Debug\IRProject.exe
+C:\Users\Olga\Documents\GitHub\IRProject\obj\x64\Debug\IRProject.pdb
