@@ -84,7 +84,34 @@ namespace IRProject_GUI
 
         private void SEARCH_Click(object sender, RoutedEventArgs e)
         {
+            //בדיקות קלט
+            if (from_radio.IsChecked.Value)
+            {
+                using (System.IO.StreamReader sr = new System.IO.StreamReader(QueryFile))
+                {
+                    string line = sr.ReadLine();
+                    while (line != null)
+                    {
+                        List<string> all = new List<string>();
+                        all.Add("All");
+                        if (line != string.Empty)
+                        {
+                            string[] split = line.Split(' ');
+                            string queryNum = split[0];
+                            int n;
+                            if (int.TryParse(queryNum, out n))
+                                m_searcher.Search(line.Replace(queryNum,"").Trim().ToLower(), all, Convert.ToInt32(queryNum));
+                        }
+                    }
+                }
+            }
+            else
+            {
+                List<string> all = new List<string>();
+                all.Add("All");
+                m_searcher.Search(Query.ToLower(), all, 10);
 
+            }
         }
 
         private void auto_complete_SelectionChanged(object sender, SelectionChangedEventArgs e)
