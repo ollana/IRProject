@@ -19,25 +19,33 @@ namespace IRProject.Ranker
             double bmRank = bm.Score(doc, _Query);
             double placeRank = PlaceRank();
             double wigthRank = TagRank();
-            double tfidfRank = tfIdfRank();
-            return 0.8* tfidfRank+ 0 *bmRank+0.1*placeRank+0.1*wigthRank;
+            double cossim = CosSim();
+            return 0.8* cossim+ 0 *bmRank+0.1*placeRank+0.1*wigthRank;
         }
 
-        private double tfIdfRank()
+        private double CosSim()
         {
             double rank = 0;
+            int lengthOfQuery = 0;
+            double WijWiq_sum = 0, Wij_sq_sum = 0, Wiq_sq_sum = 0;
+            foreach (QueryTerm q in _Query)
+                lengthOfQuery += q.Count;
             foreach (QueryTerm q in _Query)
             {
+                double Wiq = q.Count / lengthOfQuery;
+                Wiq_sq_sum += Math.Pow(Wiq, 2);
                 if (q.AppearsInDoc(_doc.DocumentNumber))
                 {
-                    double idf = Math.Log(IRSettings.Default.NumberOfDocuments/q.Term.DF);
-                  //  double tf = (q.NumberOfAppearance(_doc.DocumentNumber) / _doc.MaxTF);
-                    double tf =(q.NumberOfAppearance(_doc.DocumentNumber)/_doc.Length);
-                    
-                    rank += tf*idf;
+                    double idf = Math.Log(IRSettings.Default.NumberOfDocuments / q.Term.DF);
+                    //  double tf = (q.NumberOfAppearance(_doc.DocumentNumber) / _doc.MaxTF);
+                    double tf = (q.NumberOfAppearance(_doc.DocumentNumber) / _doc.Length);
+                    double Wij = tf * idf;
+                    Wij_sq_sum += Math.Pow(Wij, 2);
+                    WijWiq_sum += Wij*Wiq;
                 }
             }
-            return rank/_Query.Count;
+            rank = WijWiq_sum / (Math.Sqrt(Wij_sq_sum * Wiq_sq_sum));
+            return rank;
         }
 
         private double PlaceRank()
