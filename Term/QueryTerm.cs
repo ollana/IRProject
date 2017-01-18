@@ -24,10 +24,12 @@ namespace IRProject
             m_term = term;
             m_count = count;
             m_termDocuments = new Dictionary<string,Tuple<int,int,int>>();
-            string[] docs = postingData.Split('|');
+            char[] c = { '|' };
+            string[] docs = postingData.Split(c, StringSplitOptions.RemoveEmptyEntries);
             foreach (string doc in docs)
             {
-                string[] appearns = doc.Split(' ');
+                char[] s = { ' ' };
+                string[] appearns = doc.Split(s, StringSplitOptions.RemoveEmptyEntries);
                 string docNum = appearns[0];
                 int location =Convert.ToInt32(appearns[1]);
                 int wight=Convert.ToInt32(appearns[2]);
@@ -95,6 +97,15 @@ namespace IRProject
 
             throw new Exception("Term not appears in the given Document");
 
+        }
+        public List<string> GetDocumentsOfTerm()
+        {
+            List<string> docs = new List<string>();
+            foreach (var d in m_termDocuments)
+            {
+                docs.Add(d.Key);
+            }
+            return docs;
         }
 
 

@@ -55,22 +55,32 @@ namespace IRProject
         /// <param name="query"><query/param>
         /// <param name="languages"><languages/param> 
         /// <returns>list of top 50 documents</returns>
-        public List<string> Search(string query, List<string> languages)
+        public List<string> Search(string query, List<string> languages,int queryNum)
         {
             if (m_loaded)
             {
                 //list of terms in query
                 List<QueryTerm> termsInQuery = FindQueryTerms(query);
                 //list of documents to rank
-                List<Document> docToRank = FindDocumentsToRank(languages);
+                List<string> docOfQuery = new List<string>();
+                foreach (QueryTerm q in termsInQuery)
+                {
+                    foreach (string doc in q.GetDocumentsOfTerm())
+                    {
+                        if (!docOfQuery.Contains(doc))
+                            docOfQuery.Add(doc);
+                    }
+                }
+                List<Document> docToRank = FindDocumentsToRank(languages,docOfQuery);
                 //rate each document
                 foreach (Document d in docToRank)
                 {
 
                     d.Rank=m_ranker.Rank(termsInQuery, d);
                 }
-
-                return FindTop50Docs(docToRank);
+                List<string> top50= FindTop50Docs(docToRank);
+                SaveResults(queryNum, top50);
+                return top50;
             }
             else throw new Exception("Dictionary not loaded");
         }
@@ -94,12 +104,28 @@ namespace IRProject
             return topdocs;
         }
 
+        private void SaveResults(int queryNum, List<string> docs)
+        {
+            string filePath = @"C:\tr\results.txt";
+            if (!File.Exists(filePath))
+                File.Create(filePath).Close();
+
+            using (StreamWriter pairs = new StreamWriter(filePath,true))
+            {
+                foreach (string d in docs)
+                {
+
+                    pairs.WriteLine(queryNum + " " + 0 + " " + d + " " + 0 + " "+0+" mt");
+                }
+            }
+        }
+
         /// <summary>
         /// documents in the given langueges
         /// </summary>
         /// <param name="languages">langueges</param>
         /// <returns> list of documents according to the given langueges </returns>
-        private List<Document> FindDocumentsToRank(List<string> languages)
+        private List<Document> FindDocumentsToRank(List<string> languages,List<string> docs)
         {
             List<Document> docToRank = new List<Document>();
             if (!languages.Contains("All"))
@@ -108,7 +134,7 @@ namespace IRProject
                 {
                     foreach (string d in m_docInLanglanguages[lan])
                     {
-                        if (!docToRank.Contains(m_documents[d]))
+                        if (docs.Contains(d) && !docToRank.Contains(m_documents[d]))
                             docToRank.Add(m_documents[d]);
                     }
                 }
@@ -116,9 +142,9 @@ namespace IRProject
             else
             {
                 //add all documents
-                foreach (var d in m_documents)
+                foreach (var d in docs)
                 {
-                    docToRank.Add(d.Value);
+                    docToRank.Add(m_documents[d]);
                 }
             }
 
@@ -170,7 +196,7 @@ namespace IRProject
             LoadPairs(pairsFilePath);
             LoadDocuments(documentsDataPath);
             LoadDocInLanguege(langueges);
-            m_postingPath = postingPath;
+            m_postingPath = postingPath.Replace("\n","").Replace("\r","");
             m_loaded = true;
 
         }
