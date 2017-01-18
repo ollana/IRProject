@@ -42,8 +42,8 @@ namespace IRProject
             if (m_loaded)
             {
                 List<string> complete = new List<string>();
-                if (m_pairs.ContainsKey(word))
-                    complete = m_pairs[word];
+                if (m_pairs.ContainsKey(word.ToLower()))
+                    complete = m_pairs[word.ToLower()];
                 return complete;
             }
             else throw new Exception("dictionary not loaded");
