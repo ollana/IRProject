@@ -92,7 +92,7 @@ namespace IRProject
         {
             if (AppearsInDoc(docNum))
             {
-                return m_termDocuments[docNum].Item3;
+                return m_termDocuments[docNum].Item1;
             }
 
             throw new Exception("Term not appears in the given Document");

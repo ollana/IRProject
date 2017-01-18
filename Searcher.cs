@@ -195,6 +195,7 @@ namespace IRProject
             LoadDictionary(dictionaryPath);
             LoadPairs(pairsFilePath);
             LoadDocuments(documentsDataPath);
+            
             LoadDocInLanguege(langueges);
             m_postingPath = postingPath.Replace("\n","").Replace("\r","");
             m_loaded = true;

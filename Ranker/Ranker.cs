@@ -10,17 +10,18 @@ namespace IRProject.Ranker
         Document _doc;
         public Ranker()
         {
-            bm = new BM25(1.2, 100, 0.75, 0, 0);
+            
         }
         public double Rank(List<QueryTerm> Query, Document doc)
         {
+            bm = new BM25(1.2, 100, 0.75, 0, 0);
             _doc = doc;
             _Query = Query;
             double bmRank = bm.Score(doc, _Query);
             double placeRank = PlaceRank();
             double wigthRank = TagRank();
             double cossim = CosSim();
-            return 0.8* cossim+ 0 *bmRank+0.1*placeRank+0.1*wigthRank;
+            return 0.45* cossim+ 0.05 *bmRank+0.2*placeRank+0.3*wigthRank;
         }
 
         private double CosSim()
@@ -37,15 +38,16 @@ namespace IRProject.Ranker
                 if (q.AppearsInDoc(_doc.DocumentNumber))
                 {
                     double idf = Math.Log(IRSettings.Default.NumberOfDocuments / q.Term.DF);
-                    //  double tf = (q.NumberOfAppearance(_doc.DocumentNumber) / _doc.MaxTF);
-                    double tf = (q.NumberOfAppearance(_doc.DocumentNumber) / _doc.Length);
+                    //double tf = (q.NumberOfAppearance(_doc.DocumentNumber) / _doc.MaxTF);
+                    double tf = ((double)q.NumberOfAppearance(_doc.DocumentNumber) / _doc.Length);
                     double Wij = tf * idf;
                     Wij_sq_sum += Math.Pow(Wij, 2);
                     WijWiq_sum += Wij*Wiq;
+                    rank += tf * idf;
                 }
             }
-            rank = WijWiq_sum / (Math.Sqrt(Wij_sq_sum * Wiq_sq_sum));
-            return rank;
+           // rank = WijWiq_sum / (Math.Sqrt(Wij_sq_sum * Wiq_sq_sum));
+            return rank/_Query.Count;
         }
 
         private double PlaceRank()
@@ -55,7 +57,7 @@ namespace IRProject.Ranker
             {
                 if (q.AppearsInDoc(_doc.DocumentNumber))
                 {
-                    rank += 1 - (1 / ((_doc.Length / q.FirstAppearens(_doc.DocumentNumber))));
+                    rank += 1 - (1 / (((double)_doc.Length / q.FirstAppearens(_doc.DocumentNumber))));
                 }
             }
             return rank/_Query.Count;

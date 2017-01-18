@@ -36,7 +36,7 @@ namespace IRProject.Ranker
                 if(q.AppearsInDoc(d.DocumentNumber))
                 sum += ScoreOne(d.Length, q.DocumentFrequency(), q.NumberOfAppearance(d.DocumentNumber), q.Count);
             }
-            return sum;
+            return (1-(1/sum));
         }
 
         /// <summary>
