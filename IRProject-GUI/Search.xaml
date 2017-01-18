@@ -41,15 +41,15 @@
                     <ListBoxItem x:Name="auto_complete3" Content=""/>
                     <ListBoxItem x:Name="auto_complete4" Content=""/>
                     <ListBoxItem x:Name="auto_complete5" Content=""/>
-                </ListBox> 
-                <TextBlock Text="Saerch Results:"/>
-                <ListView x:Name="Results_lv" Height="200"/>
-                <TextBlock Text="Number of relevant documents: "/>
+                </ListBox>
                 <TextBlock Margin="0,10,0,0">
                     <TextBlock Text="Save results to file:  " Margin="0,-7,0,0" FontSize="16"/>
                     <TextBox x:Name="Save_path" Width="250" Height="25" LostFocus="Save_path_LostFocus"/>
                     <Button Content="Browse..." Height="25" Click="Save_file"/>
                 </TextBlock>
+                <TextBlock Text="Search Results:" Name="Saerch_Results" Visibility="Hidden"/>
+                <ListView x:Name="Results_lv" Height="200"/>
+                <TextBlock Text="Number of relevant documents: " Name="Saerch_Results_num" Visibility="Hidden"/>
             </StackPanel>
         </ScrollViewer>
     </Grid>
