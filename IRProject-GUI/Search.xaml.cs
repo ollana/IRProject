@@ -28,7 +28,7 @@ namespace IRProject_GUI
         public string QueryFile { get { return file_path.Text; } set { _queryFile = value; file_path.Text = value; } }
         public string QuerySavePath { get { return Save_path.Text; } set { _querySavePath = value; Save_path.Text = value; m_program.SaveQuery = value; } }
         public string Query { get { return query.Text; } set { _query = value; query.Text = value;} }
-        public string Languages { get { return string.Join(",",Chosen_languages); } set { Chosen_languages.Add(value); } }
+        public List<string> Languages { get { return Chosen_languages; } set { Chosen_languages=value; } }
         //for stop watch
         //DispatcherTimer dt = new DispatcherTimer();
         //Stopwatch stopWatch = new Stopwatch();
@@ -45,6 +45,10 @@ namespace IRProject_GUI
         List<string> m_langueges;
         List<string> Chosen_languages;
         List<string> autoComplete;
+
+        /// <summary>
+        /// constractor
+        /// </summary>
         public Search()
         {
             InitializeComponent();
@@ -62,24 +66,45 @@ namespace IRProject_GUI
             }
             All_Languages.IsChecked = true;
             Language_select.IsEnabled = false;
-            m_program = new ProgramUI();          
+            m_program = new ProgramUI();
+            search_radio.IsChecked = true;
+            from_radio.IsChecked = false;
+            brows_file_path.IsEnabled = false;
+            file_path.IsEnabled = false;
+            query.IsEnabled = true;
+            Query = "";
         }
 
+        /// <summary>
+        /// change query file path
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void file_path_LostFocus(object sender, TextChangedEventArgs e)
         {
             QueryFile = (sender as TextBox).Text;
         }
 
+        /// <summary>
+        /// change query 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void query_LostFocus(object sender, RoutedEventArgs e)
         {
             Query = (sender as TextBox).Text;
         }
 
+        /// <summary>
+        /// brows query file from dialog
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Browse_file(object sender, RoutedEventArgs e)
         {
-            var dialog = new System.Windows.Forms.FolderBrowserDialog();
+            var dialog = new System.Windows.Forms.OpenFileDialog();
             System.Windows.Forms.DialogResult result = dialog.ShowDialog();
-            QueryFile = dialog.SelectedPath;
+            QueryFile = dialog.FileName;
         }
 
         private void SEARCH_Click(object sender, RoutedEventArgs e)
@@ -124,18 +149,29 @@ namespace IRProject_GUI
         }
         private void All_Languages_Click(object sender, RoutedEventArgs e)
         {
-            if(sender is CheckBox)
+            Languages.Clear();
+            if ((sender as CheckBox).IsChecked.Value)
             {
-                if ((sender as CheckBox).IsChecked.Value)
-                    Language_select.IsEnabled = false;
-                else
-                    Language_select.IsEnabled = true;
+                Language_select.IsEnabled = false;
+                Languages.Add("All");
+            }
+            else
+            {
+                Language_select.IsEnabled = true;
+                for (int i = 0; i < Language_select.SelectedItems.Count; i++)
+                {
+                    Languages.Add(((ListBoxItem)Language_select.SelectedItems[i]).Content.ToString());
+                }
             }
         }
 
         private void languages_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            Languages.Clear();
+            for (int i = 0; i < Language_select.SelectedItems.Count; i++)
+            {
+                Languages.Add(((ListBoxItem)Language_select.SelectedItems[i]).Content.ToString());
+            }
         }
 
         private void Save_file(object sender, RoutedEventArgs e)
@@ -145,7 +181,7 @@ namespace IRProject_GUI
 
         private void Save_path_LostFocus(object sender, RoutedEventArgs e)
         {
-            QuerySavePath = (sender as TextBlock).Text;
+            QuerySavePath = (sender as TextBox).Text;
         }
 
         private void query_KeyDown(object sender, KeyEventArgs e)
