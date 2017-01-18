@@ -22,7 +22,6 @@ namespace IRProject_GUI
         public string Destination { get { return save_path.Text; } set { destination = value; save_path.Text = value; m_program.DictionaryDestination = value; } }
         public bool Stemming { get { return stemming.IsChecked.Value; } set { stemm = value; m_program.Stemming = value; } }
 
-
         //for stop watch
         DispatcherTimer dt = new DispatcherTimer();
         Stopwatch stopWatch = new Stopwatch();
@@ -34,10 +33,9 @@ namespace IRProject_GUI
         bool stemm;
         object[] obj;
         TaskScheduler _ui;
-        IRProject.ProgramUI m_program;
-        Searcher m_searcher;
+        static IRProject.ProgramUI m_program;
         List<string> m_langueges;
-
+        public static Searcher m_searcher;
         /// <summary>
         /// constractor
         /// </summary>
@@ -67,6 +65,8 @@ namespace IRProject_GUI
 
             _ui = TaskScheduler.FromCurrentSynchronizationContext();
         }
+
+        public Home(bool i){}
         /// <summary>
         /// browse for corpus directory
         /// </summary>

@@ -68,8 +68,11 @@ namespace IRProject
         public string DictionaryDestination
         {
             set { IRSettings.Default.Destination = value; }
-
         }
 
+        public string SaveQuery
+        {
+            set { IRSettings.Default.SaveQuery = value; }
+        }
     }
 }

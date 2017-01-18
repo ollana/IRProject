@@ -9,7 +9,7 @@
     <mui:ModernWindow.MenuLinkGroups>
         <mui:LinkGroup DisplayName="Welcome">
             <mui:LinkGroup.Links>
-                <mui:Link DisplayName="Index" Source="/Home.xaml" />
+                <mui:Link DisplayName="Index" Source="/Home.xaml"/>
                 <mui:Link DisplayName="Search" Source="/Search.xaml"/>
             </mui:LinkGroup.Links>
         </mui:LinkGroup>

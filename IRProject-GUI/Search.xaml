@@ -19,19 +19,19 @@
                         </ListBox.ItemsPanel>
                     </ListBox>
                 </ScrollViewer>
-                <CheckBox Content="Search in all languages" Click="All_Languages_Click"/>
+                <CheckBox x:Name="All_Languages" Content="Search in all languages" Click="All_Languages_Click"/>
                 <TextBlock/>
                 <TextBlock/>
                 <TextBlock Text="Query"/>
                 <TextBlock Margin="0,10,0,0">
-                    <TextBlock Text="From File:  " Margin="0,-7,0,0" FontSize="16"/>
-                    <TextBox x:Name="file_path" Width="250" Height="25" LostFocus="file_path_LostFocus"/>
-                    <Button Content="Browse..." Height="25" Click="Browse_file"/>
+                    <RadioButton Name="from_radio" Content="From File:  " Margin="0,-7,0,0" FontSize="16" Click="From_File_radio"/>
+                    <TextBox x:Name="file_path" Width="250" Height="25" TextChanged="file_path_LostFocus"/>
+                    <Button  Name="brows_file_path" Content="Browse..." Height="25" Click="Browse_file"/>
                 </TextBlock>
-                <TextBlock Margin="0,10,0,0">
-                    <TextBlock Text="Search:      " Margin="0,-7,0,0" FontSize="16"/>
-                    <TextBox Name="query" Width="250" Height="25" LostFocus="query_LostFocus" />
-                    <Button Height="25" Click="Browse_Dest">
+                <TextBlock Margin="2,10,0,0">
+                    <RadioButton Name="search_radio" Content="Search:      " Margin="0,-7,0,0" FontSize="16" Click="Search_radio"/>
+                    <TextBox Name="query" Width="250" Height="25" LostFocus="query_LostFocus" PreviewKeyDown="query_KeyDown" />
+                    <Button Height="25" Click="SEARCH_Click">
                         <Image Source="Resources\Search_Icon.png"></Image>
                     </Button>
                 </TextBlock>

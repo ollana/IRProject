@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using FirstFloor.ModernUI.Presentation;
+using IRProject;
 
 namespace IRProject_GUI
 {
