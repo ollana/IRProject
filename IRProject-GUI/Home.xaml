@@ -27,9 +27,7 @@
                 <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center">
                 <CheckBox Name="stemming" Content="   With Stemming"  FontSize="20" Width="221" VerticalAlignment="Top" Margin="0,30,0,0" Click="stemming_Click"/>
                 <CheckBox Name="no_stemming" Content="   Without Stemming"  FontSize="20"  VerticalAlignment="Top" Margin="0,30,0,0" Click="nostemming_Click"/>
-                </TextBlock>
-                <TextBlock Text="Select Language" Style="{StaticResource Heading2}" Margin="0,30,0,5" HorizontalAlignment="Center" />
-                <ComboBox Name="comboBox" Width="150" IsReadOnly="True" SelectedIndex="0"/>
+                </TextBlock>      
                 <Button Name="start_button"  Content="START" Margin="20" Click="Start_Click" HorizontalAlignment="Center" FontSize="30" />
                 <TextBlock Name="ClockTextBlock" TextAlignment="Center" VerticalAlignment="Center"/>
                 <TextBlock x:Name="Time" HorizontalAlignment="Center" Visibility="Hidden" TextWrapping="Wrap"/>
@@ -38,6 +36,7 @@
                 <TextBlock Text="Loads From: "/>
                 <TextBlock x:Name="load_path" Text ="{Binding ElementName=save_path, Path=Text}"/>
                 <TextBlock>To change this path change the destination path at the top of this window </TextBlock>
+                <TextBlock/>
                 <Button x:Name="Load_btn" Click="Load_Click" Margin="5" Content="Load" Width="211" HorizontalAlignment="Center" />
                 <Button x:Name="Display_dic" Click="Display_Click" Margin="5" Content="Display" Width="211" HorizontalAlignment="Center"/>
             </StackPanel>

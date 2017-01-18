@@ -62,7 +62,6 @@ namespace IRProject_GUI
             m_langueges = new List<string>();
             foreach (var line in splitLang)
             {
-                comboBox.Items.Add(line);
                 m_langueges.Add(line);
             }
 

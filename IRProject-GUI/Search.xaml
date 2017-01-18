@@ -1,0 +1,56 @@
+﻿<UserControl x:Class="IRProject_GUI.Search"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             mc:Ignorable="d" 
+             d:DesignHeight="1400" d:DesignWidth="700">
+    <Grid Style="{StaticResource ContentRoot}">
+        <ScrollViewer>
+            <StackPanel>
+                <TextBlock Text="Languages"/>
+                <ScrollViewer>
+                    <ListBox x:Name="Language_select" Height="100"  Margin="-7,5,0,5" SelectionMode="Multiple" BorderBrush="Teal" BorderThickness="1" Width="500" HorizontalAlignment="Center" SelectionChanged="languages_SelectionChanged">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="4"/>
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                    </ListBox>
+                </ScrollViewer>
+                <CheckBox Content="Search in all languages" Click="All_Languages_Click"/>
+                <TextBlock/>
+                <TextBlock/>
+                <TextBlock Text="Query"/>
+                <TextBlock Margin="0,10,0,0">
+                    <TextBlock Text="From File:  " Margin="0,-7,0,0" FontSize="16"/>
+                    <TextBox x:Name="file_path" Width="250" Height="25" LostFocus="file_path_LostFocus"/>
+                    <Button Content="Browse..." Height="25" Click="Browse_file"/>
+                </TextBlock>
+                <TextBlock Margin="0,10,0,0">
+                    <TextBlock Text="Search:      " Margin="0,-7,0,0" FontSize="16"/>
+                    <TextBox Name="query" Width="250" Height="25" LostFocus="query_LostFocus" />
+                    <Button Height="25" Click="Browse_Dest">
+                        <Image Source="Resources\Search_Icon.png"></Image>
+                    </Button>
+                </TextBlock>
+                <ListBox x:Name="auto_complete" Margin="78,0,0,0" BorderBrush="Teal" BorderThickness="1" Width="250" HorizontalAlignment="Left" SelectionChanged="auto_complete_SelectionChanged" Visibility="Hidden">
+                    <ListBoxItem x:Name="auto_complete1" Content=""/>
+                    <ListBoxItem x:Name="auto_complete2" Content="" />
+                    <ListBoxItem x:Name="auto_complete3" Content=""/>
+                    <ListBoxItem x:Name="auto_complete4" Content=""/>
+                    <ListBoxItem x:Name="auto_complete5" Content=""/>
+                </ListBox> 
+                <TextBlock Text="Saerch Results:"/>
+                <ListView x:Name="Results_lv" Height="200"/>
+                <TextBlock Text="Number of relevant documents: "/>
+                <TextBlock Margin="0,10,0,0">
+                    <TextBlock Text="Save results to file:  " Margin="0,-7,0,0" FontSize="16"/>
+                    <TextBox x:Name="Save_path" Width="250" Height="25" LostFocus="Save_path_LostFocus"/>
+                    <Button Content="Browse..." Height="25" Click="Save_file"/>
+                </TextBlock>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
