@@ -301,21 +301,24 @@ namespace IRProject
         /// <param name="path"> file path</param>
         private void LoadDocuments(string path)
         {
-
-            using (System.IO.StreamReader sr = new System.IO.StreamReader(path))
+            int totalLengt = 0;
+            using (StreamReader sr = new StreamReader(path))
             {
                 string line = sr.ReadLine();
-                int lineNum = 0;
+                int docIndex = 0;
                 while (line != null)
                 {
                     if (line != string.Empty)
                     {
                         string[] split = line.Split('|');
-                        m_documents.Add(split[0], new Document(line,lineNum));
-                        lineNum++;
+                        Document doc = new Document(line, docIndex);
+                        totalLengt += doc.Length;
+                        m_documents.Add(split[0], doc);
+                        docIndex++;
                     }
                     line = sr.ReadLine();
                 }
+                IRSettings.Default.AverageDocLength = totalLengt / docIndex;
             }
 
 
