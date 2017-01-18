@@ -319,6 +319,7 @@ namespace IRProject
                     line = sr.ReadLine();
                 }
                 IRSettings.Default.AverageDocLength = totalLengt / docIndex;
+                IRSettings.Default.NumberOfDocuments = docIndex;
             }
 
 
