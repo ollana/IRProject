@@ -55,7 +55,7 @@ namespace IRProject
         /// <param name="query"><query/param>
         /// <param name="languages"><languages/param> 
         /// <returns>list of top 50 documents</returns>
-        public List<string> Search(string query, List<string> languages,int queryNum)
+        public List<string> Search(string query, List<string> languages)
         {
             if (m_loaded)
             {
@@ -79,7 +79,6 @@ namespace IRProject
                     d.Rank=m_ranker.Rank(termsInQuery, d);
                 }
                 List<string> top50= FindTop50Docs(docToRank);
-                SaveResults(queryNum, top50);
                 return top50;
             }
             else throw new Exception("Dictionary not loaded");
@@ -104,22 +103,7 @@ namespace IRProject
             return topdocs;
         }
 
-        private void SaveResults(int queryNum, List<string> docs)
-        {
-            string filePath = @"C:\tr\results.txt";
-            if (!File.Exists(filePath))
-                File.Create(filePath).Close();
-
-            using (StreamWriter pairs = new StreamWriter(filePath,true))
-            {
-                foreach (string d in docs)
-                {
-
-                    pairs.WriteLine(queryNum + " " + 0 + " " + d + " " + 0 + " "+0+" mt");
-                }
-            }
-        }
-
+      
         /// <summary>
         /// documents in the given langueges
         /// </summary>
@@ -168,17 +152,10 @@ namespace IRProject
                 {
                     string line;
                     //take the term information from the posting file
-                    using (FileStream sr = new FileStream(m_postingPath, FileMode.Open, FileAccess.Read))
-                    //using (StreamReader sr = new StreamReader(m_postingPath))
+                   
+                    using (StreamReader sr = new StreamReader(m_postingPath))
                     {
-                        sr.Position = m_dictionary[t].StartPosition;
-                        //sr.Seek(m_dictionary[t].StartPosition, SeekOrigin.Begin);
-                        //line = File.ReadLines(m_postingPath).Skip(m_dictionary[t].LineNumber).Take(1).First();
-                        byte[] b = new byte[m_dictionary[t].EndPosition-m_dictionary[t].StartPosition];
-                        sr.Read(b, 0, (int)(m_dictionary[t].EndPosition - m_dictionary[t].StartPosition));
-
-                        line = System.Text.Encoding.UTF8.GetString(b);
-                        
+                        line = File.ReadLines(m_postingPath).Skip(m_dictionary[t].LineNumber).Take(1).First();
 
                     }
                     termsInQuery.Add(new QueryTerm(m_dictionary[t], parsedTerms.Count(item => item == t), line));
@@ -260,7 +237,7 @@ namespace IRProject
                     if (line != string.Empty)
                     {
                         string[] split = line.Split('|');
-                        m_dictionary.Add(split[0], new DictionaryTerm(split[0], Convert.ToInt32(split[1]), Convert.ToInt32(split[2]), lineNum, Convert.ToInt64(split[3]), Convert.ToInt64(split[4])));
+                        m_dictionary.Add(split[0], new DictionaryTerm(split[0], Convert.ToInt32(split[1]), Convert.ToInt32(split[2]), lineNum));
                     }
                     line = sr.ReadLine();
                     lineNum++;
