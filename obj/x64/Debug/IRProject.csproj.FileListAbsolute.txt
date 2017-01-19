@@ -30,3 +30,5 @@ D:\ADI\GitHub\IRProject\bin\x64\Debug\IRProject.exe
 D:\ADI\GitHub\IRProject\bin\x64\Debug\IRProject.pdb
 D:\ADI\GitHub\IRProject\bin\x64\Debug\Newtonsoft.Json.dll
 D:\ADI\GitHub\IRProject\bin\x64\Debug\Newtonsoft.Json.xml
+C:\Users\Olga\Documents\GitHub\IRProject\bin\x64\Debug\Newtonsoft.Json.dll
+C:\Users\Olga\Documents\GitHub\IRProject\bin\x64\Debug\Newtonsoft.Json.xml

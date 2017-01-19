@@ -56,7 +56,7 @@ namespace IRProject
         /// <returns>list of suggestion words</returns>
         public List<string> AutoComplete(string word)
         {
-            word.ToLower().Trim();
+            word=word.ToLower().Trim();
             if (m_loaded)
             {
                 List<string> complete = new List<string>();
@@ -75,7 +75,7 @@ namespace IRProject
         /// <returns>list of top 50 documents</returns>
         public List<string> Search(string query, List<string> languages)
         {
-            query.ToLower().Trim();
+            query=query.ToLower().Trim();
             if (m_loaded)
             {
                 //list of terms in query
