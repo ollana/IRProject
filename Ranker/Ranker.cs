@@ -21,7 +21,7 @@ namespace IRProject.Ranker
             double placeRank = PlaceRank();
             double wigthRank = TagRank();
             double cossim = CosSim();
-            return 0.45* cossim+ 0.05 *bmRank+0.2*placeRank+0.3*wigthRank;
+            return 0.5* cossim+ 0 *bmRank+0.4*placeRank+0.1*wigthRank;
         }
 
         private double CosSim()
