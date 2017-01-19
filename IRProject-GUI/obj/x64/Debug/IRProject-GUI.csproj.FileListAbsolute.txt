@@ -138,3 +138,5 @@ D:\OLLADI\IRProject\IRProject-GUI\obj\x64\Debug\Search.baml
 D:\OLLADI\IRProject\IRProject-GUI\obj\x64\Debug\Search.g.cs
 D:\ADI\GitHub\IRProject\IRProject-GUI\obj\x64\Debug\Search.baml
 D:\ADI\GitHub\IRProject\IRProject-GUI\obj\x64\Debug\Search.g.cs
+D:\ADI\GitHub\IRProject\IRProject-GUI\bin\x64\Debug\Newtonsoft.Json.dll
+D:\ADI\GitHub\IRProject\IRProject-GUI\bin\x64\Debug\Newtonsoft.Json.xml

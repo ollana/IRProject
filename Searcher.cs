@@ -45,7 +45,7 @@ namespace IRProject
             dynamic d = JsonConvert.DeserializeObject(name);
             foreach (dynamic item in d)
             {
-                //l.Add(item.word.ToString());
+                l.Add(item.word.ToString());
             }
             return l;
         }
