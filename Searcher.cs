@@ -56,6 +56,7 @@ namespace IRProject
         /// <returns>list of suggestion words</returns>
         public List<string> AutoComplete(string word)
         {
+            word.ToLower().Trim();
             if (m_loaded)
             {
                 List<string> complete = new List<string>();
@@ -74,6 +75,7 @@ namespace IRProject
         /// <returns>list of top 50 documents</returns>
         public List<string> Search(string query, List<string> languages)
         {
+            query.ToLower().Trim();
             if (m_loaded)
             {
                 //list of terms in query
@@ -128,6 +130,7 @@ namespace IRProject
         /// <returns> list of documents according to the given langueges </returns>
         private List<Document> FindDocumentsToRank(List<string> languages,List<string> docs)
         {
+
             List<Document> docToRank = new List<Document>();
             if (!languages.Contains("All"))
             {
