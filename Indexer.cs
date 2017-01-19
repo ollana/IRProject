@@ -211,10 +211,9 @@ namespace IRProject
                             foreach (string doc in docs)
                                 tf += doc.Split(' ').Length - 1;
                             //string postingline = "";
-                            List<string> postingline = new List<string>();
-                            posting.Flush();
-                            long start_point=posting.BaseStream.Position;
+                            dictionary.WriteLine(term + "|" + tf + "|" + df );
                             numOfUniqueTerms++;
+                            List<string> postingline = new List<string>();
                             foreach (string d in docs)
                             {
                                 string[] appearns = d.Split(' ');
@@ -237,9 +236,6 @@ namespace IRProject
                             {
                                 posting.Write(p);
                             }
-                            posting.Flush();
-                            long end_point = posting.BaseStream.Position;
-                            dictionary.WriteLine(term + "|" + tf + "|" + df+"|"+start_point+"|"+end_point);
                             posting.WriteLine("");
                             postingline.Clear();
 
