@@ -24,11 +24,13 @@ namespace IRProject_GUI
     /// </summary>
     public partial class Search : UserControl
     {
-        public Dictionary<string, Tuple<string, string>> Dictionary1;
         public string QueryFile { get { return file_path.Text; } set { _queryFile = value; file_path.Text = value; } }
         public string QuerySavePath { get { return Save_path.Text; } set { _querySavePath = value; Save_path.Text = value; m_program.SaveQuery = value; } }
         public string Query { get { return query.Text; } set { _query = value; query.Text = value;} }
         public List<string> Languages { get { return Chosen_languages; } set { Chosen_languages=value; } }
+        public List<Tuple<int, string>> SearchResults { get { return results; } set { results = value; } }
+        public Searcher MySearcher { get { return Home.m_searcher; } }
+
         //for stop watch
         //DispatcherTimer dt = new DispatcherTimer();
         //Stopwatch stopWatch = new Stopwatch();
@@ -41,11 +43,11 @@ namespace IRProject_GUI
         //object[] obj;
         //TaskScheduler _ui;
         IRProject.ProgramUI m_program;
-        Searcher m_searcher;
         List<string> m_langueges;
         List<string> Chosen_languages;
         List<string> autoComplete;
-
+        List<Tuple<int,string>> results;
+        int randomIndex = 451;
         /// <summary>
         /// constractor
         /// </summary>
@@ -73,8 +75,8 @@ namespace IRProject_GUI
             file_path.IsEnabled = false;
             query.IsEnabled = true;
             Query = "";
+            SearchResults = new List<Tuple<int, string>>();
         }
-
         /// <summary>
         /// change query file path
         /// </summary>
@@ -84,7 +86,6 @@ namespace IRProject_GUI
         {
             QueryFile = (sender as TextBox).Text;
         }
-
         /// <summary>
         /// change query 
         /// </summary>
@@ -94,7 +95,6 @@ namespace IRProject_GUI
         {
             Query = (sender as TextBox).Text;
         }
-
         /// <summary>
         /// brows query file from dialog
         /// </summary>
@@ -106,47 +106,146 @@ namespace IRProject_GUI
             System.Windows.Forms.DialogResult result = dialog.ShowDialog();
             QueryFile = dialog.FileName;
         }
-
+        /// <summary>
+        /// if the serch from a file iterate lines of querys and send one by one to the searcher.
+        /// then if save path is not empty, save results to file.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SEARCH_Click(object sender, RoutedEventArgs e)
         {
-            //בדיקות קלט
-            if (from_radio.IsChecked.Value)
+            Search_Results_num.Visibility = System.Windows.Visibility.Hidden;
+            Search_Results.Visibility = System.Windows.Visibility.Hidden;
+            SearchResults.Clear();
+
+            bool ok = false;
+            List<string> tempResults = new List<string>();
+            if (from_radio.IsChecked.Value)//from file 
             {
-                using (System.IO.StreamReader sr = new System.IO.StreamReader(QueryFile))
+                if (!System.IO.File.Exists(QueryFile))
+                    MessageBox.Show("The file was not found", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                else if (!Home.DicLoaded)
+                    MessageBox.Show("Please load application files first... ", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                else
+                    ok = SearchFromFile();
+            }
+            else //from text
+            {
+                if (Query.Trim() == string.Empty)
+                    MessageBox.Show("Nothing to search..", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                try
                 {
-                    string line = sr.ReadLine();
-                    while (line != null)
-                    {
-                        List<string> all = new List<string>();
-                        all.Add("All");
-                        if (line != string.Empty)
-                        {
-                            string[] split = line.Split(' ');
-                            string queryNum = split[0];
-                            int n;
-                            if (int.TryParse(queryNum, out n))
-                                m_searcher.Search(line.Replace(queryNum,"").Trim().ToLower(), all, Convert.ToInt32(queryNum));
-                        }
-                    }
+                    tempResults = MySearcher.Search(Query, Languages);
+                    AddtoResults(tempResults, randomIndex);
+                    randomIndex++;
+
+                }
+                catch
+                {
+                    MessageBox.Show("Cant read this kind of query :(");
+                    ok = false;
                 }
             }
+            if (QuerySavePath != string.Empty && ok)
+            {
+                if (!System.IO.Directory.Exists(QuerySavePath))
+                {
+                    if (
+                    MessageBox.Show("Can't find directory to save the results.. continue without saving?", "Error", MessageBoxButton.YesNo, MessageBoxImage.Error)
+                    != MessageBoxResult.Yes)
+                        return;
+                }
+                else
+                {
+                    saveResultsToFile();
+                }
+            }
+            if (!ok)
+                MessageBox.Show("Somthing went wrong...");
             else
-            {
-                List<string> all = new List<string>();
-                all.Add("All");
-                m_searcher.Search(Query.ToLower(), all, 10);
-
-            }
+                showResults();
         }
-
-        private void auto_complete_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        /// <summary>
+        /// show search results
+        /// </summary>
+        private void showResults()
         {
-            if(sender is ListBoxItem)
+            Search_Results_num.Text = SearchResults.Count.ToString();
+            Search_Results_num.Visibility = System.Windows.Visibility.Visible;
+            Search_Results.Visibility = System.Windows.Visibility.Visible;
+            Results_lv.ItemsSource = SearchResults;
+        }
+        /// <summary>
+        /// save the qurey results to a file that traceival program can read
+        /// </summary>
+        private void saveResultsToFile()
+        {
+            string filePath = QuerySavePath + UISettings.Default.SaveResult + DateTime.Now;
+            System.IO.File.Create(filePath).Close();
+            using (System.IO.StreamWriter sw = new System.IO.StreamWriter(filePath))
             {
-                Query += (sender as ListBoxItem).Content;
-                auto_complete.Visibility = System.Windows.Visibility.Hidden;
+                foreach (Tuple<int,string> res in SearchResults)
+                {
+                    sw.WriteLine(res.Item1 + " " + 0 + " " + res.Item2 + " " + 0 + " " + 0 + " mt");
+                }
             }
         }
+        /// <summary>
+        /// shearch from file
+        /// </summary>
+        private bool SearchFromFile()
+        {
+            List<string> tempResults = new List<string>();
+            using (System.IO.StreamReader sr = new System.IO.StreamReader(QueryFile))
+            {
+                string line = sr.ReadLine();
+                while (line != null)
+                {
+                    string[] splite = line.Split(' ');
+                    string queryNum = splite[0].Trim();
+                    string queryStirng = line.Substring(queryNum.Length).Trim();
+                    int n;
+                    if (int.TryParse(queryNum, out n))
+                    {
+                        try
+                        {
+                            tempResults = MySearcher.Search(queryStirng, Languages);
+                        }
+                        catch
+                        {
+                            goto Error;
+                        }
+                        AddtoResults(tempResults, n);
+                        tempResults.Clear();
+                        line = sr.ReadLine();
+                    }
+                    else
+                    {
+                    Error:
+                        MessageBox.Show("Cant read this kind of query file :(");
+                    return false;
+                    }
+                }
+                return true;
+            }
+        }
+        /// <summary>
+        /// add searcher results to list
+        /// </summary>
+        /// <param name="tempResults"></param>
+        /// <param name="n"></param>
+        private void AddtoResults(List<string> tempResults, int n)
+        {
+            foreach (string doc in tempResults)
+            {
+                SearchResults.Add(new Tuple<int, string>(n, doc));
+            }
+        }
+        /// <summary>
+        /// select to search in all languages
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void All_Languages_Click(object sender, RoutedEventArgs e)
         {
             Languages.Clear();
@@ -164,7 +263,11 @@ namespace IRProject_GUI
                 }
             }
         }
-
+        /// <summary>
+        /// add or remove languge from choosen languages list
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void languages_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             Languages.Clear();
@@ -173,41 +276,82 @@ namespace IRProject_GUI
                 Languages.Add(((ListBoxItem)Language_select.SelectedItems[i]).Content.ToString());
             }
         }
-
+        /// <summary>
+        /// open folder browes to choose a folder to save the query results. 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Save_file(object sender, RoutedEventArgs e)
         {
-
+            var dialog = new System.Windows.Forms.FolderBrowserDialog();
+            System.Windows.Forms.DialogResult result = dialog.ShowDialog();
+            QuerySavePath = dialog.SelectedPath;
         }
-
+        /// <summary>
+        /// when entering a string to the save to file text box - save it to querySavePath
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Save_path_LostFocus(object sender, RoutedEventArgs e)
         {
             QuerySavePath = (sender as TextBox).Text;
         }
-
+        /// <summary>
+        /// auto complete for one term in the query serch text box
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void query_KeyDown(object sender, KeyEventArgs e)
         {
-            if(sender is TextBox)
+            if (e.Key == Key.Space)
             {
-                if(e.Key == Key.Space)
+                if (Query.Split(' ').Length == 1)
                 {
-                    if (Query.Split(' ').Length == 1)
+                    if (MySearcher != null)
                     {
-                        m_searcher = Home.m_searcher;
-                        if (m_searcher != null)
-                        {
-                            autoComplete = m_searcher.AutoComplete(Query);
-                            if (autoComplete.Count > 0) auto_complete1.Content = autoComplete[0];
-                            if (autoComplete.Count > 1) auto_complete2.Content = autoComplete[1];
-                            if (autoComplete.Count > 2) auto_complete1.Content = autoComplete[2];
-                            if (autoComplete.Count > 3) auto_complete2.Content = autoComplete[3];
-                            if (autoComplete.Count > 4) auto_complete1.Content = autoComplete[4];
-                            auto_complete.Visibility = System.Windows.Visibility.Visible;
-                        }
+                        autoComplete = MySearcher.AutoComplete(Query);
+                        if (autoComplete.Count > 0) auto_complete1.Content = autoComplete[0];
+                        if (autoComplete.Count > 1) auto_complete2.Content = autoComplete[1];
+                        if (autoComplete.Count > 2) auto_complete3.Content = autoComplete[2];
+                        if (autoComplete.Count > 3) auto_complete4.Content = autoComplete[3];
+                        if (autoComplete.Count > 4) auto_complete5.Content = autoComplete[4];
+                        auto_complete.Visibility = System.Windows.Visibility.Visible;
                     }
                 }
             }
+            else if(e.Key == Key.Back)
+            {
+                foreach (ListBoxItem item in auto_complete.Items)
+                {
+                    item.Content = "";
+                }
+                auto_complete.Visibility = System.Windows.Visibility.Hidden;
+            }
+            if (e.Key == Key.Down)
+            {
+                if (auto_complete.SelectedIndex < 4)
+                    auto_complete.SelectedIndex++;
+            }
+            else if (e.Key == Key.Up)
+            {
+                if (auto_complete.SelectedIndex > 0)
+                    auto_complete.SelectedIndex--;
+            }
+            else if (e.Key == Key.Tab)
+            {
+                Query += ((ListBoxItem)auto_complete.SelectedItem).Content.ToString();
+                foreach (ListBoxItem item in auto_complete.Items)
+                {
+                    item.Content = "";
+                }
+                auto_complete.Visibility = System.Windows.Visibility.Hidden;
+            }
         }
-
+        /// <summary>
+        /// select to search a query/querys by a file
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void From_File_radio(object sender, RoutedEventArgs e)
         {
             brows_file_path.IsEnabled = true;
@@ -216,7 +360,11 @@ namespace IRProject_GUI
             query.IsEnabled = false;
             Query = "From file";
         }
-
+        /// <summary>
+        /// select to search a query by enter a string into text box
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Search_radio(object sender, RoutedEventArgs e)
         {
             from_radio.IsChecked = false;
@@ -224,6 +372,39 @@ namespace IRProject_GUI
             file_path.IsEnabled = false;
             query.IsEnabled = true;
             Query = "";
+        }
+        /// <summary>
+        /// for selecting auto complete 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void auto_complete_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.Key == Key.Down)
+            {
+                if (auto_complete.SelectedIndex>0)
+                    auto_complete.SelectedIndex = auto_complete.SelectedIndex--;
+            }
+            else if (e.Key == Key.Up)
+            {
+                if (auto_complete.SelectedIndex < 4)
+                    auto_complete.SelectedIndex = auto_complete.SelectedIndex++;
+            }
+            else if (e.Key == Key.Tab)
+            {
+                Query += ((ListBoxItem)auto_complete.SelectedItem).Content.ToString();
+                auto_complete.Visibility = System.Windows.Visibility.Hidden;
+            }
+        }
+        /// <summary>
+        /// click on the auto complete term
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void auto_complete_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            Query += ((ListBoxItem)auto_complete.SelectedItem).Content.ToString();
+            auto_complete.Visibility = System.Windows.Visibility.Hidden;
         }
     }
 }

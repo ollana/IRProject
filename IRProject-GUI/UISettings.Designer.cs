@@ -12,7 +12,7 @@ namespace IRProject_GUI {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "14.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "12.0.0.0")]
     internal sealed partial class UISettings : global::System.Configuration.ApplicationSettingsBase {
         
         private static UISettings defaultInstance = ((UISettings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new UISettings())));
@@ -92,6 +92,18 @@ namespace IRProject_GUI {
             }
             set {
                 this["DocumentsWithoutStemming"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("OLLADI_RESULT_")]
+        public string SaveResult {
+            get {
+                return ((string)(this["SaveResult"]));
+            }
+            set {
+                this["SaveResult"] = value;
             }
         }
     }

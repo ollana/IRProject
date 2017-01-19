@@ -8,7 +8,7 @@
              d:DesignHeight="1400" d:DesignWidth="700">
     <Grid Style="{StaticResource ContentRoot}">
         <ScrollViewer>
-            <StackPanel>
+            <StackPanel PreviewKeyDown="auto_complete_PreviewKeyDown">
                 <TextBlock Text="Languages"/>
                 <ScrollViewer>
                     <ListBox x:Name="Language_select" Height="100"  Margin="-7,5,0,5" SelectionMode="Multiple" BorderBrush="Teal" BorderThickness="1" Width="500" HorizontalAlignment="Center" SelectionChanged="languages_SelectionChanged">
@@ -35,7 +35,7 @@
                         <Image Source="Resources\Search_Icon.png"></Image>
                     </Button>
                 </TextBlock>
-                <ListBox x:Name="auto_complete" Margin="78,0,0,0" BorderBrush="Teal" BorderThickness="1" Width="250" HorizontalAlignment="Left" SelectionChanged="auto_complete_SelectionChanged" Visibility="Hidden">
+                <ListBox x:Name="auto_complete" Margin="102,0,0,0" SelectedIndex="0" MouseDoubleClick="auto_complete_MouseDoubleClick" BorderBrush="Teal" BorderThickness="1" Width="250" HorizontalAlignment="Left" Visibility="Hidden" >
                     <ListBoxItem x:Name="auto_complete1" Content=""/>
                     <ListBoxItem x:Name="auto_complete2" Content="" />
                     <ListBoxItem x:Name="auto_complete3" Content=""/>
@@ -47,9 +47,9 @@
                     <TextBox x:Name="Save_path" Width="250" Height="25" LostFocus="Save_path_LostFocus"/>
                     <Button Content="Browse..." Height="25" Click="Save_file"/>
                 </TextBlock>
-                <TextBlock Text="Search Results:" Name="Saerch_Results" Visibility="Hidden"/>
+                <TextBlock Text="Search Results:" Name="Search_Results" Visibility="Hidden"/>
                 <ListView x:Name="Results_lv" Height="200"/>
-                <TextBlock Text="Number of relevant documents: " Name="Saerch_Results_num" Visibility="Hidden"/>
+                <TextBlock Text="Number of relevant documents: " Name="Search_Results_num" Visibility="Hidden"/>
             </StackPanel>
         </ScrollViewer>
     </Grid>

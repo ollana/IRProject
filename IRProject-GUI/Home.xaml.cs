@@ -21,7 +21,7 @@ namespace IRProject_GUI
         public string Corpus { get { return corpus_path.Text; } set { corpus = value; corpus_path.Text = value; m_program.CorpusDestination = value;} }
         public string Destination { get { return save_path.Text; } set { destination = value; save_path.Text = value; m_program.DictionaryDestination = value; } }
         public bool Stemming { get { return stemming.IsChecked.Value; } set { stemm = value; m_program.Stemming = value; } }
-
+        static public bool DicLoaded { get { return isLoaded; } set { isLoaded = value; } }
         //for stop watch
         DispatcherTimer dt = new DispatcherTimer();
         Stopwatch stopWatch = new Stopwatch();
@@ -36,6 +36,7 @@ namespace IRProject_GUI
         static IRProject.ProgramUI m_program;
         List<string> m_langueges;
         public static Searcher m_searcher;
+        static bool isLoaded;
         /// <summary>
         /// constractor
         /// </summary>
@@ -47,7 +48,7 @@ namespace IRProject_GUI
             Destination = System.IO.Directory.GetCurrentDirectory();
             stemming.IsChecked = true;
             Stemming = true;
-
+            DicLoaded = false;
             no_stemming.IsChecked = false;
             dt.Tick += new EventHandler(dt_Tick);
             dt.Interval = new TimeSpan(0, 0, 0, 0, 1);
@@ -284,8 +285,11 @@ namespace IRProject_GUI
                         }
                         line = sr.ReadLine();
                         lineNum++;
-                    }                    
+                    }       
                 }
+
+                Display_dic.IsEnabled = true;
+                DicLoaded = true;
                 MessageBox.Show("Dictionary was loaded");
             }
             else if(System.IO.File.Exists(dictionaryPath))
@@ -297,7 +301,6 @@ namespace IRProject_GUI
             else if (System.IO.File.Exists(postingPath))
                 MessageBox.Show("could not find Posting file in path:\n" + dictionaryPath, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 
-            Display_dic.IsEnabled = true;
         }
         /// <summary>
         /// opens a new window that displays the dictionary
