@@ -213,7 +213,8 @@ namespace IRProject_GUI
                         }
                         catch
                         {
-                            goto Error;
+                            MessageBox.Show("Cant read this kind of query file :(");
+                            return false;
                         }
                         AddtoResults(tempResults, n);
                         tempResults.Clear();
@@ -221,9 +222,8 @@ namespace IRProject_GUI
                     }
                     else
                     {
-                    Error:
                         MessageBox.Show("Cant read this kind of query file :(");
-                    return false;
+                        return false;
                     }
                 }
                 return true;

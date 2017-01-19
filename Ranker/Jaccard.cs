@@ -6,6 +6,12 @@ namespace IRProject.Ranker
     class Jaccard
     {
         Dictionary<string,List<int>> DocTermsList;
+        /// <summary>
+        /// this mathod iterates the posting file and for each document adds his terms to the list. 
+        /// fills the dictionary with document number as key and a list of int - each int reprisents the term and each line in
+        /// the posting reprsents the number of the term
+        /// </summary>
+        /// <param name="PostingPath"></param>
         public Jaccard(string PostingPath)
         {
             DocTermsList = new Dictionary<string, List<int>>();

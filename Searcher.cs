@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using IRProject.Ranker;
+using Newtonsoft.Json;
+using System.Net;
 
 namespace IRProject
 {
@@ -17,8 +19,7 @@ namespace IRProject
         string m_postingPath;
         bool m_loaded;
         public bool Loaded { get { return m_loaded; } }
-
-
+        
         /// <summary>
         /// constractor
         /// </summary>
@@ -31,6 +32,22 @@ namespace IRProject
             m_docInLanglanguages = new Dictionary<string, List<string>>();
             m_loaded = false;
             m_ranker = new Ranker.Ranker();
+        }
+
+        public List<string> GetSemantic(string term, int max)
+        {
+            List<string> l = new List<string>();
+            string name;
+            using (WebClient wc = new WebClient())
+            {
+                name = wc.DownloadString("http://api.datamuse.com/words?ml="+term+"&max="+max);
+            }
+            dynamic d = JsonConvert.DeserializeObject(name);
+            foreach (dynamic item in d)
+            {
+                l.Add(item.word.ToString());
+            }
+            return l;
         }
         /// <summary>
         /// returns list of 5 top options to suggest
