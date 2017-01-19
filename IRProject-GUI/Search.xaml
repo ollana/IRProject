@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:mui="http://firstfloorsoftware.com/ModernUI"
              mc:Ignorable="d" 
-             d:DesignHeight="1400" d:DesignWidth="700">
+             d:DesignHeight="650" d:DesignWidth="700">
     <Grid Style="{StaticResource ContentRoot}">
         <ScrollViewer>
             <StackPanel PreviewKeyDown="auto_complete_PreviewKeyDown">
@@ -44,7 +44,7 @@
                         <Image Source="Resources\Search_Icon.png"></Image>
                     </Button>
                 </TextBlock>
-                <ListBox x:Name="auto_complete" Margin="102,0,0,0" SelectedIndex="0" MouseDoubleClick="auto_complete_MouseDoubleClick" BorderBrush="Teal" BorderThickness="1" Width="250" HorizontalAlignment="Left" Visibility="Hidden" >
+                <ListBox x:Name="auto_complete" Margin="102,0,0,0" SelectedIndex="0" MouseDown="auto_complete_MouseDown" BorderBrush="Teal" BorderThickness="1" Width="250" HorizontalAlignment="Left" Visibility="Hidden" >
                     <ListBoxItem x:Name="auto_complete1" Content=""/>
                     <ListBoxItem x:Name="auto_complete2" Content="" />
                     <ListBoxItem x:Name="auto_complete3" Content=""/>

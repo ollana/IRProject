@@ -1,21 +1,9 @@
 ﻿using IRProject;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Windows.Threading;
 
 namespace IRProject_GUI
 {
@@ -330,17 +318,17 @@ namespace IRProject_GUI
                         if (autoComplete.Count > 2) auto_complete3.Content = autoComplete[2];
                         if (autoComplete.Count > 3) auto_complete4.Content = autoComplete[3];
                         if (autoComplete.Count > 4) auto_complete5.Content = autoComplete[4];
-                        auto_complete.Visibility = System.Windows.Visibility.Visible;
+                        auto_complete.Visibility = Visibility.Visible;
                     }
+                }
+                else
+                {
+                    clearAoutoComplete();
                 }
             }
             else if(e.Key == Key.Back)
             {
-                foreach (ListBoxItem item in auto_complete.Items)
-                {
-                    item.Content = "";
-                }
-                auto_complete.Visibility = System.Windows.Visibility.Hidden;
+                clearAoutoComplete();
             }
             if (e.Key == Key.Down)
             {
@@ -352,16 +340,28 @@ namespace IRProject_GUI
                 if (auto_complete.SelectedIndex > 0)
                     auto_complete.SelectedIndex--;
             }
-            else if (e.Key == Key.Tab)
+            else if (e.Key == Key.Tab || e.Key == Key.Enter)
             {
                 Query += ((ListBoxItem)auto_complete.SelectedItem).Content.ToString();
-                foreach (ListBoxItem item in auto_complete.Items)
-                {
-                    item.Content = "";
-                }
-                auto_complete.Visibility = System.Windows.Visibility.Hidden;
+                clearAoutoComplete();
+            }
+            else
+            {
+                clearAoutoComplete();
             }
         }
+        /// <summary>
+        /// hides autocomplete
+        /// </summary>
+        private void clearAoutoComplete()
+        {
+            foreach (ListBoxItem item in auto_complete.Items)
+            {
+                item.Content = "";
+            }
+            auto_complete.Visibility = Visibility.Hidden;
+        }
+
         /// <summary>
         /// select to search a query/querys by a file
         /// </summary>
@@ -408,7 +408,7 @@ namespace IRProject_GUI
             else if (e.Key == Key.Tab)
             {
                 Query += ((ListBoxItem)auto_complete.SelectedItem).Content.ToString();
-                auto_complete.Visibility = System.Windows.Visibility.Hidden;
+                auto_complete.Visibility = Visibility.Hidden;
             }
         }
         /// <summary>
@@ -416,10 +416,10 @@ namespace IRProject_GUI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void auto_complete_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void auto_complete_MouseDown(object sender, MouseButtonEventArgs e)
         {
             Query += ((ListBoxItem)auto_complete.SelectedItem).Content.ToString();
-            auto_complete.Visibility = System.Windows.Visibility.Hidden;
+            auto_complete.Visibility = Visibility.Hidden;
         }
 
         /// <summary>
