@@ -168,9 +168,17 @@ namespace IRProject
                 {
                     string line;
                     //take the term information from the posting file
-                    using (StreamReader sr = new StreamReader(m_postingPath))
+                    using (FileStream sr = new FileStream(m_postingPath, FileMode.Open, FileAccess.Read))
+                    //using (StreamReader sr = new StreamReader(m_postingPath))
                     {
-                        line = File.ReadLines(m_postingPath).Skip(m_dictionary[t].LineNumber).Take(1).First();
+                        sr.Position = m_dictionary[t].StartPosition;
+                        //sr.Seek(m_dictionary[t].StartPosition, SeekOrigin.Begin);
+                        //line = File.ReadLines(m_postingPath).Skip(m_dictionary[t].LineNumber).Take(1).First();
+                        byte[] b = new byte[m_dictionary[t].EndPosition-m_dictionary[t].StartPosition];
+                        sr.Read(b, 0, (int)(m_dictionary[t].EndPosition - m_dictionary[t].StartPosition));
+
+                        line = System.Text.Encoding.UTF8.GetString(b);
+                        
 
                     }
                     termsInQuery.Add(new QueryTerm(m_dictionary[t], parsedTerms.Count(item => item == t), line));
@@ -252,7 +260,7 @@ namespace IRProject
                     if (line != string.Empty)
                     {
                         string[] split = line.Split('|');
-                        m_dictionary.Add(split[0], new DictionaryTerm(split[0], Convert.ToInt32(split[1]), Convert.ToInt32(split[2]), lineNum));
+                        m_dictionary.Add(split[0], new DictionaryTerm(split[0], Convert.ToInt32(split[1]), Convert.ToInt32(split[2]), lineNum, Convert.ToInt64(split[3]), Convert.ToInt64(split[4])));
                     }
                     line = sr.ReadLine();
                     lineNum++;
