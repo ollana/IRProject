@@ -34,7 +34,11 @@ namespace IRProject.Ranker
                 }
             }
         }
-
+        /// <summary>
+        /// save similar documents 
+        /// </summary>
+        /// <param name="fileName">file path to save the information</param>
+        /// <param name="rank">from what rank to save the information</param>
         public void JaccardToFile(string fileName,double rank)
         {
             if (!System.IO.File.Exists(fileName))
@@ -54,11 +58,22 @@ namespace IRProject.Ranker
             }
                 
         }
+        /// <summary>
+        /// Symmetric difference - jaccard coefficient
+        /// </summary>
+        /// <param name="hs1"></param>
+        /// <param name="hs2"></param>
+        /// <returns></returns>
         public double Calc(HashSet<int> hs1, HashSet<int> hs2)
         {
             return hs1.Intersect(hs2).Count() / (double)hs1.Union(hs2).Count();
         }
-
+        /// <summary>
+        /// transfer the list to hash set
+        /// </summary>
+        /// <param name="ls1"></param>
+        /// <param name="ls2"></param>
+        /// <returns></returns>
         public double Calc(List<int> ls1, List<int> ls2)
         {
             HashSet<int> hs1 = new HashSet<int>(ls1);
