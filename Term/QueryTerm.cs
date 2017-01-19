@@ -19,11 +19,17 @@ namespace IRProject
         /// <param name="term">term </param>
         /// <param name="count">times appeared in query</param>
         /// <param name="postingData">posting information </param>
-        public QueryTerm(DictionaryTerm term, int count, string postingData)
+        public QueryTerm(DictionaryTerm term, int count)
         {
             m_term = term;
             m_count = count;
-            m_termDocuments = new Dictionary<string,Tuple<int,int,int>>();
+            m_termDocuments = new Dictionary<string, Tuple<int, int, int>>();
+            
+
+        }
+
+        public void SetPostingData(string postingData)
+        {
             char[] c = { '|' };
             string[] docs = postingData.Split(c, StringSplitOptions.RemoveEmptyEntries);
             foreach (string doc in docs)
@@ -31,12 +37,11 @@ namespace IRProject
                 char[] s = { ' ' };
                 string[] appearns = doc.Split(s, StringSplitOptions.RemoveEmptyEntries);
                 string docNum = appearns[0];
-                int location =Convert.ToInt32(appearns[1]);
-                int wight=Convert.ToInt32(appearns[2]);
-                int appearens= Convert.ToInt32(appearns[3]);
-                m_termDocuments.Add(docNum, new Tuple<int,int,int>(location,wight, appearens));
+                int location = Convert.ToInt32(appearns[1]);
+                int wight = Convert.ToInt32(appearns[2]);
+                int appearens = Convert.ToInt32(appearns[3]);
+                m_termDocuments.Add(docNum, new Tuple<int, int, int>(location, wight, appearens));
             }
-
         }
 
         /// <summary>

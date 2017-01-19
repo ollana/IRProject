@@ -167,20 +167,32 @@ namespace IRProject
             {
                 if (m_dictionary.ContainsKey(t) && !termsAdded.Contains(t))
                 {
-                    string line;
-                    //take the term information from the posting file
-                   
-                    using (StreamReader sr = new StreamReader(m_postingPath))
-                    {
-                        line = File.ReadLines(m_postingPath).Skip(m_dictionary[t].LineNumber).Take(1).First();
-
-                    }
-                    termsInQuery.Add(new QueryTerm(m_dictionary[t], parsedTerms.Count(item => item == t), line));
+                    
+                    termsInQuery.Add(new QueryTerm(m_dictionary[t], parsedTerms.Count(item => item == t)));
                     termsAdded.Add(t);
                 }
 
             }
+            GetPostingInformationForTerms(ref termsInQuery);
             return termsInQuery;
+        }
+
+        private void GetPostingInformationForTerms(ref List<QueryTerm> termsInQuery)
+        {
+            string line;
+            //take the term information from the posting file
+            using (StreamReader sr = new StreamReader(m_postingPath))
+            {
+                int lineNum = 0;
+                foreach (QueryTerm q in termsInQuery)
+                {
+                    line = File.ReadLines(m_postingPath).Skip(q.Term.LineNumber-lineNum).Take(1).First();
+                    lineNum = q.Term.LineNumber;
+                    q.SetPostingData(line);
+
+                }
+
+            }
         }
 
 
