@@ -183,14 +183,19 @@ namespace IRProject
         private void GetPostingInformationForTerms(ref List<QueryTerm> termsInQuery)
         {
             string line;
+            termsInQuery=termsInQuery.OrderBy(t => t.Term.LineNumber).ToList();
             //take the term information from the posting file
             using (StreamReader sr = new StreamReader(m_postingPath))
             {
                 int lineNum = 0;
                 foreach (QueryTerm q in termsInQuery)
                 {
-                    line = File.ReadLines(m_postingPath).Skip(q.Term.LineNumber-lineNum).Take(1).First();
-                    lineNum = q.Term.LineNumber;
+                    for (int i = 0; i < q.Term.LineNumber - lineNum; i++)
+                    {
+                        sr.ReadLine();
+                    }
+                    line = sr.ReadLine();
+                    lineNum = q.Term.LineNumber+1;
                     q.SetPostingData(line);
 
                 }
