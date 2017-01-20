@@ -44,8 +44,8 @@ namespace IRProject_GUI
         {
             InitializeComponent();
             m_program= new IRProject.ProgramUI();
-            Corpus = System.IO.Directory.GetCurrentDirectory();
-            Destination = System.IO.Directory.GetCurrentDirectory();
+            Corpus = @"d:\corpus";
+            Destination = @"d:\OLLADI";
             stemming.IsChecked = true;
             Stemming = true;
             DicLoaded = false;
@@ -261,7 +261,7 @@ namespace IRProject_GUI
             {
                 dictionaryPath = Destination + "\\" + UISettings.Default.DictionaryWithoutStemming;
                 documentsDataPath = Destination + "\\" + UISettings.Default.DocumentsWithoutStemming;
-                postingPath = Destination + "\\" + UISettings.Default.PostingWithStemming;
+                postingPath = Destination + "\\" + UISettings.Default.PostingWithoutStemming;
 
             }
             pairsFilePath = Destination + "\\Pairs-WithoutStemming";

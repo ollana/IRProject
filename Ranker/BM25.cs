@@ -34,9 +34,9 @@ namespace IRProject.Ranker
             foreach (QueryTerm q in Query)
             {
                 if(q.AppearsInDoc(d.DocumentNumber))
-                sum += ScoreOne(d.Length, q.DocumentFrequency(), q.NumberOfAppearance(d.DocumentNumber), q.Count);
+                    sum += ScoreOne(d.Length, q.DocumentFrequency(), q.NumberOfAppearance(d.DocumentNumber), q.Count)*q.Wigth;
             }
-            return (1-(1/sum));
+            return sum;
         }
 
         /// <summary>

@@ -83,7 +83,7 @@ namespace IRProject
                 List<QueryTerm> queryTerms= FindQueryTerms(query);
                 foreach (QueryTerm q in queryTerms)
                 {
-                    q.Wigth = 0.7 / queryTerms.Count;
+                    q.Wigth = 0.5 / queryTerms.Count;
                     linesToGet.Add(q.Term.LineNumber);
                 }
                 string semanticQuery = "";
@@ -99,7 +99,7 @@ namespace IRProject
                 List<QueryTerm> semanticQueryTerms = FindQueryTerms(semanticQuery);
                 foreach (QueryTerm q in semanticQueryTerms)
                 {
-                    q.Wigth = 0.3 / semanticQueryTerms.Count;
+                    q.Wigth = 0.5 / semanticQueryTerms.Count;
                     linesToGet.Add(q.Term.LineNumber);
                     queryTerms.Add(q);
                 }
@@ -119,7 +119,7 @@ namespace IRProject
         private List<string> FindRelevantDocsInQuery(List<QueryTerm> termsInQuery, List<string> languages)
         {
             //list of documents to rank
-            List<string> docOfQuery = new List<string>();
+            HashSet<string> docOfQuery = new HashSet<string>();
             foreach (QueryTerm q in termsInQuery)
             {
                 foreach (string doc in q.GetDocumentsOfTerm())
@@ -128,7 +128,7 @@ namespace IRProject
                         docOfQuery.Add(doc);
                 }
             }
-            List<Document> docToRank = FindDocumentsToRank(languages, docOfQuery);
+            HashSet<Document> docToRank = FindDocumentsToRank(languages, docOfQuery);
             //rate each document
             foreach (Document d in docToRank)
             {
@@ -144,7 +144,7 @@ namespace IRProject
         /// </summary>
         /// <param name="docToRank">documents</param>
         /// <returns>list of top 50 docs</returns>
-        private List<string> FindTop50Docs(List<Document> docToRank)
+        private List<string> FindTop50Docs(HashSet<Document> docToRank)
         {
             List<string> topdocs = new List<string>();
             List<Document> rankedDoc = docToRank.OrderBy(p => p.Rank).ToList<Document>();
@@ -153,6 +153,7 @@ namespace IRProject
             {
                 if (topdocs.Count < 50)
                     topdocs.Add(d.DocumentNumber);
+                else break;
             }
             return topdocs;
         }
@@ -163,10 +164,10 @@ namespace IRProject
         /// </summary>
         /// <param name="languages">langueges</param>
         /// <returns> list of documents according to the given langueges </returns>
-        private List<Document> FindDocumentsToRank(List<string> languages,List<string> docs)
+        private HashSet<Document> FindDocumentsToRank(List<string> languages,HashSet<string> docs)
         {
 
-            List<Document> docToRank = new List<Document>();
+            HashSet<Document> docToRank = new HashSet<Document>();
             if (!languages.Contains("All"))
             {
                 foreach (string lan in languages)
@@ -380,6 +381,23 @@ namespace IRProject
                 IRSettings.Default.NumberOfDocuments = docIndex;
             }
 
+
+        }
+        private void LoadDocumentsSimilarity(string path)
+        {
+            using (StreamReader sr = new StreamReader(path))
+            {
+                string line = sr.ReadLine();
+                while (line != null)
+                {
+                    if (line != string.Empty)
+                    {
+                       
+                    }
+                    line = sr.ReadLine();
+                }
+               
+            }
 
         }
     }

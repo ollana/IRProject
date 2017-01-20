@@ -54,6 +54,7 @@ namespace IRProject_GUI
         public Search()
         {
             InitializeComponent();
+            Query = @"c:\tr\queries.txt";
             string lineOfContents = Properties.Resources.LANGUAGES;
             string[] splitLang = lineOfContents.Split('\n');
             m_langueges = new List<string>();
@@ -138,6 +139,7 @@ namespace IRProject_GUI
                     tempResults = MySearcher.Search(Query, Languages);
                     AddtoResults(tempResults, randomIndex);
                     randomIndex++;
+                    ok = true;
 
                 }
                 catch
@@ -180,7 +182,9 @@ namespace IRProject_GUI
         /// </summary>
         private void saveResultsToFile()
         {
-            string filePath = QuerySavePath + UISettings.Default.SaveResult + DateTime.Now;
+            
+            //string filePath = QuerySavePath+"\\" + UISettings.Default.SaveResult + DateTime.Now;
+            string filePath = QuerySavePath + "\\results.txt";
             System.IO.File.Create(filePath).Close();
             using (System.IO.StreamWriter sw = new System.IO.StreamWriter(filePath))
             {
