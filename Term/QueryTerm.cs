@@ -7,9 +7,11 @@ namespace IRProject
     {
         public DictionaryTerm Term { get { return m_term; }  }
         public int Count { get { return m_count; } }
+        public double Wigth { get { return m_wigth; } set { m_wigth = value; } }
 
         DictionaryTerm m_term;
         int m_count;
+        double m_wigth;
         //document-first location, max wight, number of appearens
         Dictionary<string,Tuple <int, int,int>> m_termDocuments;
 

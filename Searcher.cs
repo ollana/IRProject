@@ -9,17 +9,17 @@ using System.Net;
 namespace IRProject
 {
     public class Searcher
-    { 
+    {
         Dictionary<string, DictionaryTerm> m_dictionary;
         Dictionary<string, List<string>> m_pairs;
         Dictionary<string, Document> m_documents;
-        Dictionary<string,List<string>> m_docInLanglanguages;
+        Dictionary<string, List<string>> m_docInLanglanguages;
         Parse m_parser;
         Ranker.Ranker m_ranker;
         string m_postingPath;
         bool m_loaded;
         public bool Loaded { get { return m_loaded; } }
-        
+
         /// <summary>
         /// constractor
         /// </summary>
@@ -40,7 +40,7 @@ namespace IRProject
             string name;
             using (WebClient wc = new WebClient())
             {
-                name = wc.DownloadString("http://api.datamuse.com/words?ml="+term+"&max="+max);
+                name = wc.DownloadString("http://api.datamuse.com/words?ml=" + term + "&max=" + max);
             }
             dynamic d = JsonConvert.DeserializeObject(name);
             foreach (dynamic item in d)
@@ -56,7 +56,7 @@ namespace IRProject
         /// <returns>list of suggestion words</returns>
         public List<string> AutoComplete(string word)
         {
-            word=word.ToLower().Trim();
+            word = word.ToLower().Trim();
             if (m_loaded)
             {
                 List<string> complete = new List<string>();
@@ -75,33 +75,70 @@ namespace IRProject
         /// <returns>list of top 50 documents</returns>
         public List<string> Search(string query, List<string> languages)
         {
-            query=query.ToLower().Trim();
+            query = query.ToLower().Trim();
+            languages.Add("All");
             if (m_loaded)
             {
-                //list of terms in query
-                List<QueryTerm> termsInQuery = FindQueryTerms(query);
-                //list of documents to rank
-                List<string> docOfQuery = new List<string>();
-                foreach (QueryTerm q in termsInQuery)
+                List<int> linesToGet = new List<int>();
+                List<QueryTerm> queryTerms= FindQueryTerms(query);
+                foreach (QueryTerm q in queryTerms)
                 {
-                    foreach (string doc in q.GetDocumentsOfTerm())
+                    q.Wigth = 0.7 / queryTerms.Count;
+                    linesToGet.Add(q.Term.LineNumber);
+                }
+                string semanticQuery = "";
+                string[] queryWord = query.Split(' ');
+                foreach (string word in queryWord)
+                {
+                    List<string> semanticofWord = GetSemantic(word, 5);
+                    foreach (string w in semanticofWord)
                     {
-                        if (!docOfQuery.Contains(doc))
-                            docOfQuery.Add(doc);
+                        semanticQuery += w + " ";
                     }
                 }
-                List<Document> docToRank = FindDocumentsToRank(languages,docOfQuery);
-                //rate each document
-                foreach (Document d in docToRank)
+                List<QueryTerm> semanticQueryTerms = FindQueryTerms(semanticQuery);
+                foreach (QueryTerm q in semanticQueryTerms)
                 {
-
-                    d.Rank=m_ranker.Rank(termsInQuery, d);
+                    q.Wigth = 0.3 / semanticQueryTerms.Count;
+                    linesToGet.Add(q.Term.LineNumber);
+                    queryTerms.Add(q);
                 }
-                List<string> top50= FindTop50Docs(docToRank);
-                return top50;
+                Dictionary<int,string> lines=GetPostingInformationForTerms(linesToGet);
+                foreach (QueryTerm q in queryTerms)
+                {
+                    q.SetPostingData(lines[q.Term.LineNumber]);
+                }
+                return FindRelevantDocsInQuery(queryTerms, languages);
             }
+
+
             else throw new Exception("Dictionary not loaded");
         }
+
+
+        private List<string> FindRelevantDocsInQuery(List<QueryTerm> termsInQuery, List<string> languages)
+        {
+            //list of documents to rank
+            List<string> docOfQuery = new List<string>();
+            foreach (QueryTerm q in termsInQuery)
+            {
+                foreach (string doc in q.GetDocumentsOfTerm())
+                {
+                    if (!docOfQuery.Contains(doc))
+                        docOfQuery.Add(doc);
+                }
+            }
+            List<Document> docToRank = FindDocumentsToRank(languages, docOfQuery);
+            //rate each document
+            foreach (Document d in docToRank)
+            {
+
+                d.Rank = m_ranker.Rank(termsInQuery, d);
+            }
+            List<string> top50 = FindTop50Docs(docToRank);
+            return top50;
+        }
+
         /// <summary>
         /// find and return top 50 ranked documents
         /// </summary>
@@ -116,8 +153,6 @@ namespace IRProject
             {
                 if (topdocs.Count < 50)
                     topdocs.Add(d.DocumentNumber);
-                else
-                    break;
             }
             return topdocs;
         }
@@ -170,37 +205,37 @@ namespace IRProject
             {
                 if (m_dictionary.ContainsKey(t) && !termsAdded.Contains(t))
                 {
-                    
                     termsInQuery.Add(new QueryTerm(m_dictionary[t], parsedTerms.Count(item => item == t)));
                     termsAdded.Add(t);
                 }
 
             }
-            GetPostingInformationForTerms(ref termsInQuery);
+           // GetPostingInformationForTerms(ref termsInQuery);
             return termsInQuery;
         }
 
-        private void GetPostingInformationForTerms(ref List<QueryTerm> termsInQuery)
+        private Dictionary<int,string> GetPostingInformationForTerms(List<int> lineNumbers)
         {
+            Dictionary<int, string> postingOfLines = new Dictionary<int, string>();
             string line;
-            termsInQuery=termsInQuery.OrderBy(t => t.Term.LineNumber).ToList();
+            lineNumbers.Sort();
             //take the term information from the posting file
             using (StreamReader sr = new StreamReader(m_postingPath))
             {
-                int lineNum = 0;
-                foreach (QueryTerm q in termsInQuery)
+                int last= lineNumbers.Last();
+                for (int i = 1; i <= last; i++)
                 {
-                    for (int i = 0; i < q.Term.LineNumber - lineNum; i++)
+                    if (lineNumbers.Contains(i))
                     {
-                        sr.ReadLine();
+                        line = sr.ReadLine();
+                        postingOfLines.Add(i, line);
                     }
-                    line = sr.ReadLine();
-                    lineNum = q.Term.LineNumber+1;
-                    q.SetPostingData(line);
-
+                    else
+                        sr.ReadLine();
                 }
 
             }
+            return postingOfLines;
         }
 
 
@@ -267,7 +302,7 @@ namespace IRProject
             using (System.IO.StreamReader sr = new System.IO.StreamReader(path))
             {
                 string line = sr.ReadLine();
-                int lineNum = 0;
+                int lineNum = 1;
 
                 while (line != null)
                 {

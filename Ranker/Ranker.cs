@@ -43,11 +43,11 @@ namespace IRProject.Ranker
                     //double Wij = tf * idf;
                     //Wij_sq_sum += (double)Math.Pow(Wij, 2);
                     //WijWiq_sum += Wij*Wiq;
-                    rank += tf * idf;
+                    rank += tf * idf*q.Wigth;
                 }
             }
            // rank = WijWiq_sum / (Math.Sqrt(Wij_sq_sum * Wiq_sq_sum));
-            return rank/ _Query.Count;
+            return rank;
         }
 
         private double PlaceRank()
