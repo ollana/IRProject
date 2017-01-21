@@ -14,7 +14,7 @@ namespace IRProject.Ranker
         }
         public double Rank(List<QueryTerm> Query, Document doc)
         {
-            bm = new BM25(1.2, 0, 0.25, 0, 0);
+            bm = new BM25(0.8, 0, 0.25, 0, 0);
             _doc = doc;
             _Query = Query;
             double bmRank = bm.Score(doc, _Query);
@@ -23,7 +23,7 @@ namespace IRProject.Ranker
             double tfidf = TfIdf();
             // return 0.6 * tfidf + 0.8 * bmRank + 0.3 * placeRank + 0.095 * wigthRank;
              //  return bmRank;
-            return 0.7*(0.8 * tfidf + 0.2 * placeRank+ 0*wigthRank)+ 0.3*bmRank;
+            return 0.3*(0.8 * tfidf + 0.2 * placeRank+ 0*wigthRank)+ 0.7*bmRank;
         }
 
         private double TfIdf()

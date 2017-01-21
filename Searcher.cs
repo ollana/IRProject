@@ -47,6 +47,7 @@ namespace IRProject
             {
                 l.Add(item.word.ToString());
             }
+            
             return l;
         }
         /// <summary>
