@@ -10,6 +10,14 @@ namespace IRProject.Ranker
         double _avgdl;
         int _N;
 
+        /// <summary>
+        /// constractor
+        /// </summary>
+        /// <param name="k1">k1</param>
+        /// <param name="k2">k2</param>
+        /// <param name="b">b</param>
+        /// <param name="R">R</param>
+        /// <param name="ri">ri</param>
         public BM25( double k1, double k2, double b, int R, int ri)
         {
             _k1 = k1;

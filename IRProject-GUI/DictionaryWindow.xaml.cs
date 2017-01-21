@@ -33,7 +33,7 @@ namespace IRProject_GUI
         /// </summary>
         /// <param name="dic">dictionary</param>
         /// <param name="stemming">flag of stemming</param>
-        public void TableDic(Dictionary<string,Tuple<string,string>> dic, bool stemming)
+        public void TableDic(Dictionary<string,int> dic, bool stemming)
         {
             if (stemming)
                 main.Title = "Dictionary With Stamming";
@@ -43,7 +43,7 @@ namespace IRProject_GUI
             term.Add("Term  -  Frequency");
             foreach (var item in dic)
             {
-                term.Add(item.Key + "  -  " + item.Value.Item1);
+                term.Add(item.Key + "  -  " + item.Value);
             }
             Term.ItemsSource = term;
         }

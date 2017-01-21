@@ -8,6 +8,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resources/search_icon.png")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resources/stop_words.txt")]
 
 

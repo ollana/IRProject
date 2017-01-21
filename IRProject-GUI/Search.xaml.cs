@@ -48,17 +48,19 @@ namespace IRProject_GUI
         List<string> autoComplete;
         List<Tuple<int,string>> results;
         int randomIndex = 451;
+
         /// <summary>
         /// constractor
         /// </summary>
         public Search()
         {
             InitializeComponent();
-            Query = @"c:\tr\queries.txt";
+            
             string lineOfContents = Properties.Resources.LANGUAGES;
             string[] splitLang = lineOfContents.Split('\n');
             m_langueges = new List<string>();
             Chosen_languages = new List<string>();
+            Languages.Add("All");
             foreach (var line in splitLang)
             {
                 ListBoxItem item= new ListBoxItem();
@@ -115,32 +117,44 @@ namespace IRProject_GUI
         /// <param name="e"></param>
         private void SEARCH_Click(object sender, RoutedEventArgs e)
         {
-            Search_Results_num.Visibility = System.Windows.Visibility.Hidden;
-            Search_Results.Visibility = System.Windows.Visibility.Hidden;
+            if(!Home.DicLoaded)
+            {
+                MessageBox.Show("Please load application files first... ", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
             SearchResults.Clear();
+            Results_lv.Visibility = Visibility.Hidden;
 
             bool ok = false;
             List<string> tempResults = new List<string>();
             if (from_radio.IsChecked.Value)//from file 
             {
                 if (!System.IO.File.Exists(QueryFile))
-                    MessageBox.Show("The file was not found", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                else if (!Home.DicLoaded)
-                    MessageBox.Show("Please load application files first... ", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                {
+                    MessageBox.Show("The query file was not found", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
                 else
                     ok = SearchFromFile();
             }
             else //from text
             {
                 if (Query.Trim() == string.Empty)
+                {
                     MessageBox.Show("Nothing to search..", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
                 try
                 {
                     tempResults = MySearcher.Search(Query, Languages);
                     AddtoResults(tempResults, randomIndex);
                     randomIndex++;
+                    if (tempResults.Count == 0)
+                    {
+                        MessageBox.Show("There are no documents matching your query :(");
+                        return;
+                    }
                     ok = true;
-
                 }
                 catch
                 {
@@ -148,6 +162,7 @@ namespace IRProject_GUI
                     ok = false;
                 }
             }
+            
             if (QuerySavePath != string.Empty && ok)
             {
                 if (!System.IO.Directory.Exists(QuerySavePath))
@@ -162,10 +177,11 @@ namespace IRProject_GUI
                     saveResultsToFile();
                 }
             }
-            if (!ok)
-                MessageBox.Show("Somthing went wrong...");
-            else
+            if (ok)
+            {
                 showResults();
+                MessageBox.Show("Results are ready");
+            }
         }
         /// <summary>
         /// show search results
@@ -176,14 +192,14 @@ namespace IRProject_GUI
             Search_Results_num.Visibility = System.Windows.Visibility.Visible;
             Search_Results.Visibility = System.Windows.Visibility.Visible;
             Results_lv.ItemsSource = SearchResults;
+            Results_lv.Visibility = Visibility.Visible;
+
         }
         /// <summary>
         /// save the qurey results to a file that traceival program can read
         /// </summary>
         private void saveResultsToFile()
         {
-            
-            //string filePath = QuerySavePath+"\\" + UISettings.Default.SaveResult + DateTime.Now;
             string filePath = QuerySavePath + "\\results.txt";
             System.IO.File.Create(filePath).Close();
             using (System.IO.StreamWriter sw = new System.IO.StreamWriter(filePath))
@@ -200,37 +216,32 @@ namespace IRProject_GUI
         private bool SearchFromFile()
         {
             List<string> tempResults = new List<string>();
-            using (System.IO.StreamReader sr = new System.IO.StreamReader(QueryFile))
+            try
             {
-                string line = sr.ReadLine();
-                while (line != null)
+                using (System.IO.StreamReader sr = new System.IO.StreamReader(QueryFile))
                 {
-                    string[] splite = line.Split(' ');
-                    string queryNum = splite[0].Trim();
-                    string queryStirng = line.Substring(queryNum.Length).Trim();
-                    int n;
-                    if (int.TryParse(queryNum, out n))
+                    string line = sr.ReadLine();
+                    while (line != null)
                     {
-                        try
+                        string[] splite = line.Split(' ');
+                        string queryNum = splite[0].Trim();
+                        string queryStirng = line.Substring(queryNum.Length).Trim();
+                        int n;
+                        if (int.TryParse(queryNum, out n))
                         {
                             tempResults = MySearcher.Search(queryStirng, Languages);
+                            AddtoResults(tempResults, n);
+                            tempResults.Clear();
                         }
-                        catch
-                        {
-                            MessageBox.Show("Cant read this kind of query file :(");
-                            return false;
-                        }
-                        AddtoResults(tempResults, n);
-                        tempResults.Clear();
                         line = sr.ReadLine();
                     }
-                    else
-                    {
-                        MessageBox.Show("Cant read this kind of query file :(");
-                        return false;
-                    }
+                    return true;
                 }
-                return true;
+            }
+            catch
+            {
+                MessageBox.Show("Cant read this kind of query file :(");
+                return false;
             }
         }
         /// <summary>
@@ -409,6 +420,23 @@ namespace IRProject_GUI
         {
             Query += ((ListBoxItem)auto_complete.SelectedItem).Content.ToString();
             auto_complete.Visibility = System.Windows.Visibility.Hidden;
+        }
+
+        /// <summary>
+        /// clear all results
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Reset_Click(object sender, RoutedEventArgs e)
+        {
+            SearchResults.Clear();
+            Results_lv.Visibility = Visibility.Hidden;
+            Search_Results_num.Visibility = System.Windows.Visibility.Hidden;
+            Search_Results.Visibility = System.Windows.Visibility.Hidden;
+            if(QuerySavePath!=""  && System.IO.File.Exists(QuerySavePath + "\\results.txt"))
+                System.IO.File.Delete(QuerySavePath + "\\results.txt");
+
+
         }
     }
 }

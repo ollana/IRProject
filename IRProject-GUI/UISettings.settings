@@ -21,8 +21,5 @@
     <Setting Name="DocumentsWithoutStemming" Type="System.String" Scope="User">
       <Value Profile="(Default)">Documents-WithoutStemming</Value>
     </Setting>
-    <Setting Name="SaveResult" Type="System.String" Scope="User">
-      <Value Profile="(Default)">OLLADI_RESULT_</Value>
-    </Setting>
   </Settings>
 </SettingsFile>

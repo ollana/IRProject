@@ -9,6 +9,10 @@
     <Grid Style="{StaticResource ContentRoot}">
         <ScrollViewer>
             <StackPanel PreviewKeyDown="auto_complete_PreviewKeyDown">
+                <TextBlock TextWrapping="Wrap" Foreground="LightCoral"  >
+                    To use the search service you MUST load the dictinary first, to do so- go to the 'Index' tab and load it with or without stemming. Your search will be done according to that choice, you can change it any time in the 'index' tab, make sure you reload the dictionary. 
+                </TextBlock>
+                <TextBlock></TextBlock>
                 <TextBlock Text="Languages"/>
                 <ScrollViewer>
                     <ListBox x:Name="Language_select" Height="100"  Margin="-7,5,0,5" SelectionMode="Multiple" BorderBrush="Teal" BorderThickness="1" Width="500" HorizontalAlignment="Center" SelectionChanged="languages_SelectionChanged">
@@ -21,6 +25,11 @@
                 </ScrollViewer>
                 <CheckBox x:Name="All_Languages" Content="Search in all languages" Click="All_Languages_Click"/>
                 <TextBlock/>
+                <TextBlock Margin="0,10,0,0">
+                    <TextBlock Text="Save results to:  " Margin="0,-7,0,0" FontSize="16"/>
+                    <TextBox x:Name="Save_path" Width="250" Height="25" LostFocus="Save_path_LostFocus"/>
+                    <Button Content="Browse..." Height="25" Click="Save_file"/>
+                </TextBlock>
                 <TextBlock/>
                 <TextBlock Text="Query"/>
                 <TextBlock Margin="0,10,0,0">
@@ -42,11 +51,8 @@
                     <ListBoxItem x:Name="auto_complete4" Content=""/>
                     <ListBoxItem x:Name="auto_complete5" Content=""/>
                 </ListBox>
-                <TextBlock Margin="0,10,0,0">
-                    <TextBlock Text="Save results to file:  " Margin="0,-7,0,0" FontSize="16"/>
-                    <TextBox x:Name="Save_path" Width="250" Height="25" LostFocus="Save_path_LostFocus"/>
-                    <Button Content="Browse..." Height="25" Click="Save_file"/>
-                </TextBlock>
+                
+                <Button Name="reset_button" Content="Reset" HorizontalAlignment="Center" Click="Reset_Click" />
                 <TextBlock Text="Search Results:" Name="Search_Results" Visibility="Hidden"/>
                 <ListView x:Name="Results_lv" Height="200"/>
                 <TextBlock Text="Number of relevant documents: " Name="Search_Results_num" Visibility="Hidden"/>

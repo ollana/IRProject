@@ -17,7 +17,6 @@ namespace IRProject_GUI
     /// </summary>
     public partial class Home : UserControl
     {
-        public Dictionary<string, Tuple<string, string>> Dictionary1; 
         public string Corpus { get { return corpus_path.Text; } set { corpus = value; corpus_path.Text = value; m_program.CorpusDestination = value;} }
         public string Destination { get { return save_path.Text; } set { destination = value; save_path.Text = value; m_program.DictionaryDestination = value; } }
         public bool Stemming { get { return stemming.IsChecked.Value; } set { stemm = value; m_program.Stemming = value; } }
@@ -130,6 +129,7 @@ namespace IRProject_GUI
             obj = m_program.MainUI();
 
         }
+
         /// <summary>
         /// what to do when the work of the woker finished
         /// </summary>
@@ -214,7 +214,7 @@ namespace IRProject_GUI
             var result = MessageBox.Show("Are you sure you whant to reset settings? \nthe following will delete posting and dictionary files! \nallso it will reset the main memory of the program.", "RESET", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (result.ToString() == "Yes")
             {
-                Dictionary1 = null;
+                isLoaded = false;
                 m_searcher.ResetDictionaries();
                 if (!System.IO.Directory.Exists(Destination))
                 {
@@ -243,71 +243,30 @@ namespace IRProject_GUI
         /// </summary>
         private void Load_Click(object sender, RoutedEventArgs e)
         {
-            m_searcher = new Searcher(Corpus);
+            m_searcher = new Searcher();
             Display_dic.IsEnabled = false;
             if (!System.IO.Directory.Exists(Destination))
             {
                 MessageBox.Show("Destination path could not be found", "path not found", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            string dictionaryPath, pairsFilePath,documentsDataPath,postingPath;
-            if (Stemming)
+            if (LoadDictionaries())
             {
-                dictionaryPath = Destination + "\\" + UISettings.Default.DictionaryWithStemming;
-                documentsDataPath = Destination + "\\" + UISettings.Default.DocumentsWithStemming;
-                postingPath = Destination + "\\" + UISettings.Default.PostingWithStemming;
-            }
-            else
-            {
-                dictionaryPath = Destination + "\\" + UISettings.Default.DictionaryWithoutStemming;
-                documentsDataPath = Destination + "\\" + UISettings.Default.DocumentsWithoutStemming;
-                postingPath = Destination + "\\" + UISettings.Default.PostingWithoutStemming;
-
-            }
-            pairsFilePath = Destination + "\\Pairs-WithoutStemming";
-
-            if (System.IO.File.Exists(dictionaryPath)&& System.IO.File.Exists(pairsFilePath)&& System.IO.File.Exists(documentsDataPath)&& System.IO.File.Exists(postingPath))
-            {
-                m_searcher.LoadDictionaries(dictionaryPath, pairsFilePath, documentsDataPath, postingPath,m_langueges);   
-                Dictionary1 =  new Dictionary<string, Tuple<string, string>>();
-
-                using (System.IO.StreamReader sr = new System.IO.StreamReader(dictionaryPath))
-                {
-                    string line = sr.ReadLine();
-                    int lineNum = 0;
-                    
-                    while (line!=null)
-                    {
-                        if(line!=string.Empty)
-                        {
-                            string[] split = line.Split('|');
-                            Dictionary1.Add(split[0], new Tuple<string, string>(split[1], split[2]));
-                        }
-                        line = sr.ReadLine();
-                        lineNum++;
-                    }       
-                }
-
                 Display_dic.IsEnabled = true;
                 DicLoaded = true;
                 MessageBox.Show("Dictionary was loaded");
             }
-            else if(System.IO.File.Exists(dictionaryPath))
-                MessageBox.Show("could not find dictionary in path:\n" + dictionaryPath,"Error",MessageBoxButton.OK,MessageBoxImage.Error);
-            else if (System.IO.File.Exists(pairsFilePath))
-                MessageBox.Show("could not find Paurs fil ine path:\n" + pairsFilePath, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            else if (System.IO.File.Exists(documentsDataPath))
-                MessageBox.Show("could not find Documents file in path:\n" + dictionaryPath, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            else if (System.IO.File.Exists(postingPath))
-                MessageBox.Show("could not find Posting file in path:\n" + dictionaryPath, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 
         }
+
+        
+
         /// <summary>
         /// opens a new window that displays the dictionary
         /// </summary>
         private void Display_Click(object sender, RoutedEventArgs e)
         {
-            if (Dictionary1 == null)
+            if (!DicLoaded)
             {
                 MessageBox.Show("there is no dictionary in the program memory.\nplease select load first", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -315,7 +274,7 @@ namespace IRProject_GUI
             try
             {
                 DictionaryWindow dw = new DictionaryWindow();
-                dw.TableDic(Dictionary1, stemm);
+                dw.TableDic(m_searcher.getDictionary(), stemm);
                 dw.ShowDialog();
             }
             catch
@@ -359,6 +318,54 @@ namespace IRProject_GUI
         {
             Destination = (sender as TextBox).Text;
 
+        }
+
+        /// <summary>
+        /// load dictionaries
+        /// </summary>
+        /// <returns>true if completed </returns>
+        private bool LoadDictionaries()
+        {
+
+            string dictionaryPath, pairsFilePath, documentsDataPath, postingPath,stopWordsPath;
+            if (Stemming)
+            {
+                dictionaryPath = Destination + "\\" + UISettings.Default.DictionaryWithStemming;
+                documentsDataPath = Destination + "\\" + UISettings.Default.DocumentsWithStemming;
+                postingPath = Destination + "\\" + UISettings.Default.PostingWithStemming;
+            }
+            else
+            {
+                dictionaryPath = Destination + "\\" + UISettings.Default.DictionaryWithoutStemming;
+                documentsDataPath = Destination + "\\" + UISettings.Default.DocumentsWithoutStemming;
+                postingPath = Destination + "\\" + UISettings.Default.PostingWithoutStemming;
+
+            }
+            pairsFilePath = Destination + "\\Pairs-WithoutStemming";
+            stopWordsPath = Destination + "\\" + "stop_words.txt";
+            if (System.IO.File.Exists(dictionaryPath) && System.IO.File.Exists(pairsFilePath) && System.IO.File.Exists(documentsDataPath) && System.IO.File.Exists(postingPath))
+            {
+                try
+                {
+                    m_searcher.LoadDictionaries(dictionaryPath, pairsFilePath, documentsDataPath, postingPath, stopWordsPath, m_langueges);
+                    return true;
+                }
+                catch
+                {
+                    MessageBox.Show("Somthing went wrong, one or more files is defective", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
+                }
+                
+            }
+            if (!System.IO.File.Exists(dictionaryPath))
+                MessageBox.Show("could not find dictionary in path:\n" + dictionaryPath, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            if (!System.IO.File.Exists(pairsFilePath))
+                MessageBox.Show("could not find Pairs file in path:\n" + pairsFilePath, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            if (!System.IO.File.Exists(documentsDataPath))
+                MessageBox.Show("could not find Documents file in path:\n" + dictionaryPath, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            if (!System.IO.File.Exists(postingPath))
+                MessageBox.Show("could not find Posting file in path:\n" + dictionaryPath, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            return false;
         }
 
     }

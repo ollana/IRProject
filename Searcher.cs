@@ -23,33 +23,17 @@ namespace IRProject
         /// <summary>
         /// constractor
         /// </summary>
-        public Searcher(string docPath)
+        public Searcher()
         {
             m_dictionary = new Dictionary<string, DictionaryTerm>();
             m_pairs = new Dictionary<string, List<string>>();
-            m_parser = new Parse(docPath);
             m_documents = new Dictionary<string, Document>();
             m_docInLanglanguages = new Dictionary<string, List<string>>();
             m_loaded = false;
             m_ranker = new Ranker.Ranker();
         }
 
-        public List<string> GetSemantic(string term, int max)
-        {
-            List<string> l = new List<string>();
-            string name;
-            using (WebClient wc = new WebClient())
-            {
-                name = wc.DownloadString("http://api.datamuse.com/words?ml=" + term + "&max=" + max);
-            }
-            dynamic d = JsonConvert.DeserializeObject(name);
-            foreach (dynamic item in d)
-            {
-                l.Add(item.word.ToString());
-            }
-            
-            return l;
-        }
+        
         /// <summary>
         /// returns list of 5 top options to suggest
         /// </summary>
@@ -77,7 +61,6 @@ namespace IRProject
         public List<string> Search(string query, List<string> languages)
         {
             query = query.ToLower().Trim();
-            languages.Add("All");
             if (m_loaded)
             {
                 List<int> linesToGet = new List<int>();
@@ -104,6 +87,8 @@ namespace IRProject
                     linesToGet.Add(q.Term.LineNumber);
                     queryTerms.Add(q);
                 }
+                if (queryTerms.Count == 0)
+                    return new List<string>();
                 Dictionary<int,string> lines=GetPostingInformationForTerms(linesToGet);
                 foreach (QueryTerm q in queryTerms)
                 {
@@ -116,7 +101,12 @@ namespace IRProject
             else throw new Exception("Dictionary not loaded");
         }
 
-
+        /// <summary>
+        /// find relevant documents to query
+        /// </summary>
+        /// <param name="termsInQuery"></param>
+        /// <param name="languages"></param>
+        /// <returns>top 50 documents</returns>
         private List<string> FindRelevantDocsInQuery(List<QueryTerm> termsInQuery, List<string> languages)
         {
             //list of documents to rank
@@ -167,7 +157,6 @@ namespace IRProject
         /// <returns> list of documents according to the given langueges </returns>
         private HashSet<Document> FindDocumentsToRank(List<string> languages,HashSet<string> docs)
         {
-
             HashSet<Document> docToRank = new HashSet<Document>();
             if (!languages.Contains("All"))
             {
@@ -212,16 +201,20 @@ namespace IRProject
                 }
 
             }
-           // GetPostingInformationForTerms(ref termsInQuery);
             return termsInQuery;
         }
 
+        /// <summary>
+        /// load the posting information needed for query
+        /// </summary>
+        /// <param name="lineNumbers"> liens numbers to load </param>
+        /// <returns> nessecary  posting data </returns>
         private Dictionary<int,string> GetPostingInformationForTerms(List<int> lineNumbers)
         {
             Dictionary<int, string> postingOfLines = new Dictionary<int, string>();
             string line;
             lineNumbers.Sort();
-            //take the term information from the posting file
+            //take the term information from the posting file by order
             using (StreamReader sr = new StreamReader(m_postingPath))
             {
                 int last= lineNumbers.Last();
@@ -249,12 +242,12 @@ namespace IRProject
         /// <param name="documentsDataPath">documents file path</param>
         /// <param name="postingPath">posting file path</param>
         /// <param name="langueges">list of langueges</param>
-        public void LoadDictionaries(string dictionaryPath, string pairsFilePath, string documentsDataPath,string postingPath, List<string> langueges)
+        public void LoadDictionaries(string dictionaryPath, string pairsFilePath, string documentsDataPath,string postingPath,string stopWordsPath, List<string> langueges)
         {
+            m_parser = new Parse(stopWordsPath);
             LoadDictionary(dictionaryPath);
             LoadPairs(pairsFilePath);
             LoadDocuments(documentsDataPath);
-            
             LoadDocInLanguege(langueges);
             m_postingPath = postingPath.Replace("\n","").Replace("\r","");
             m_loaded = true;
@@ -384,6 +377,25 @@ namespace IRProject
 
 
         }
+
+        /// <summary>
+        /// returns the dictionary with tf for each term
+        /// </summary>
+        /// <returns>dictionary of terms with tf for each term</returns>
+        public Dictionary<string, int> getDictionary()
+        {
+            Dictionary<string, int> dic = new Dictionary<string, int>();
+            foreach (var term in m_dictionary)
+            {
+                dic.Add(term.Key,term.Value.TF);
+            }
+            return dic;
+        }
+
+        /// <summary>
+        /// load similar documents for each doc
+        /// </summary>
+        /// <param name="path">file path</param>
         private void LoadDocumentsSimilarity(string path)
         {
             using (StreamReader sr = new StreamReader(path))
@@ -400,6 +412,29 @@ namespace IRProject
                
             }
 
+        }
+
+        /// <summary>
+        /// get semantic words ot ferm
+        /// </summary>
+        /// <param name="term"> term</param>
+        /// <param name="max">number of words </param>
+        /// <returns>list of semantic words</returns>
+        private List<string> GetSemantic(string term, int max)
+        {
+            List<string> l = new List<string>();
+            string name;
+            using (WebClient wc = new WebClient())
+            {
+                name = wc.DownloadString("http://api.datamuse.com/words?ml=" + term + "&max=" + max);
+            }
+            dynamic d = JsonConvert.DeserializeObject(name);
+            foreach (dynamic item in d)
+            {
+                l.Add(item.word.ToString());
+            }
+
+            return l;
         }
     }
 }
