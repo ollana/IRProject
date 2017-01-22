@@ -327,7 +327,7 @@ namespace IRProject_GUI
         private bool LoadDictionaries()
         {
 
-            string dictionaryPath, pairsFilePath, documentsDataPath, postingPath,stopWordsPath;
+            string dictionaryPath, pairsFilePath, documentsDataPath, postingPath,stopWordsPath,similarDocsPath;
             if (Stemming)
             {
                 dictionaryPath = Destination + "\\" + UISettings.Default.DictionaryWithStemming;
@@ -342,12 +342,13 @@ namespace IRProject_GUI
 
             }
             pairsFilePath = Destination + "\\Pairs-WithoutStemming";
-            stopWordsPath = Destination + "\\" + "stop_words.txt";
+            stopWordsPath = Destination + "\\stop_words.txt";
+            similarDocsPath = destination + "\\JACCARD";
             if (System.IO.File.Exists(dictionaryPath) && System.IO.File.Exists(pairsFilePath) && System.IO.File.Exists(documentsDataPath) && System.IO.File.Exists(postingPath))
             {
                 try
                 {
-                    m_searcher.LoadDictionaries(dictionaryPath, pairsFilePath, documentsDataPath, postingPath, stopWordsPath, m_langueges);
+                    m_searcher.LoadDictionaries(dictionaryPath, pairsFilePath, documentsDataPath, postingPath, stopWordsPath, similarDocsPath, m_langueges);
                     return true;
                 }
                 catch

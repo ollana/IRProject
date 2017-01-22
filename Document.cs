@@ -13,6 +13,7 @@ namespace IRProject
         string m_DocNumber, m_language,m_DocDate;
         int m_max_tf, m_numOfUniqueWord,m_length,m_lineNumber;
         double m_rank;
+        List<Tuple<string, double>> m_similarDoc;
         /// <summary>
         /// constractor, constract a document and save his attributes
         /// </summary>
@@ -30,7 +31,6 @@ namespace IRProject
         }
         public Document(string docInfo,int lineNumber)
         {
-            // DocNumber + "|" + Language + "|" + DocDate + "|" + max_tf + "|" + numOfUniqueWord + "|" + length;
             string[] info = docInfo.Split('|');
             m_DocNumber = info[0];
             m_language = info[1];
@@ -38,9 +38,27 @@ namespace IRProject
             m_max_tf = Convert.ToInt32( info[3]);
             m_numOfUniqueWord = Convert.ToInt32(info[4]);
             m_length = Convert.ToInt32(info[5]);
+            m_similarDoc = new List<Tuple<string, double>>();
             m_lineNumber = lineNumber;
 
         }
+        /// <summary>
+        /// save the most similar documents for this document with pracentage of similarity
+        /// </summary>
+        /// <param name="line"></param>
+        public void SetSimilarDocuments(string line)
+        {
+            char[] c = { '|' };
+            string[] docs = line.Split(c, StringSplitOptions.RemoveEmptyEntries);
+            foreach (string d in docs)
+            {
+                string[] split = d.Split(' ');
+                double precentage;
+                if (double.TryParse(split[1], out precentage))
+                    m_similarDoc.Add(new Tuple<string, double>(split[0], precentage));
+            }
+        }
+        public List<Tuple<string,double>> SimilarDocuments { get { return m_similarDoc; } }
 
         public string DocumentNumber { get { return m_DocNumber; }  }
 

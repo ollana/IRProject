@@ -126,8 +126,39 @@ namespace IRProject
 
                 d.Rank = m_ranker.Rank(termsInQuery, d);
             }
+            addSimilarDocuments(ref docToRank);
             List<string> top50 = FindTop50Docs(docToRank);
             return top50;
+        }
+
+        private void addSimilarDocuments(ref HashSet<Document> docToRank)
+        {
+            HashSet<string> documentesInSet = new HashSet<string>();
+            List<Document> rankedDocuments = docToRank.OrderBy(p => p.Rank).ToList<Document>();
+            rankedDocuments.Reverse();
+            int count = 0;
+            foreach (var item in rankedDocuments)
+            {
+                documentesInSet.Add(item.DocumentNumber);
+            }
+            foreach (Document Doc in rankedDocuments)
+            {
+                if (count > 15) break;
+                count++;
+                int doccouunt = 0;
+                foreach (var similarDoc in Doc.SimilarDocuments)
+                {
+                    if (doccouunt > 4) break;
+                    doccouunt++;
+                    m_documents[similarDoc.Item1].Rank += 0.8*Doc.Rank * similarDoc.Item2;
+
+                    if (!documentesInSet.Contains(similarDoc.Item1))
+                    {
+                        documentesInSet.Add(similarDoc.Item1);
+                        docToRank.Add(m_documents[similarDoc.Item1]);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -144,7 +175,7 @@ namespace IRProject
             {
                 if (topdocs.Count < 50)
                     topdocs.Add(d.DocumentNumber);
-                else break;
+                d.Rank = 0;
             }
             return topdocs;
         }
@@ -242,12 +273,13 @@ namespace IRProject
         /// <param name="documentsDataPath">documents file path</param>
         /// <param name="postingPath">posting file path</param>
         /// <param name="langueges">list of langueges</param>
-        public void LoadDictionaries(string dictionaryPath, string pairsFilePath, string documentsDataPath,string postingPath,string stopWordsPath, List<string> langueges)
+        public void LoadDictionaries(string dictionaryPath, string pairsFilePath, string documentsDataPath,string postingPath,string stopWordsPath,string docSimilarityPath, List<string> langueges)
         {
             m_parser = new Parse(stopWordsPath);
             LoadDictionary(dictionaryPath);
             LoadPairs(pairsFilePath);
             LoadDocuments(documentsDataPath);
+            LoadDocumentsSimilarity(docSimilarityPath);
             LoadDocInLanguege(langueges);
             m_postingPath = postingPath.Replace("\n","").Replace("\r","");
             m_loaded = true;
@@ -405,7 +437,9 @@ namespace IRProject
                 {
                     if (line != string.Empty)
                     {
-                       
+                        string[] split = line.Split('#');
+                        if(split.Length>1 && split[1]!="" && m_documents.ContainsKey(split[0]))
+                            m_documents[split[0]].SetSimilarDocuments(split[1]);
                     }
                     line = sr.ReadLine();
                 }
