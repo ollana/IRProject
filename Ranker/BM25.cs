@@ -35,7 +35,7 @@ namespace IRProject.Ranker
         /// </summary>
         /// <param name="Document"></param>
         /// <param name="query"></param>
-        /// <returns></returns>
+        /// <returns> rank </returns>
         public double Score(Document d, List<QueryTerm> Query)
         {
             double sum = 0;

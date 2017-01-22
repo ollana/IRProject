@@ -50,12 +50,17 @@ namespace IRProject
         {
             char[] c = { '|' };
             string[] docs = line.Split(c, StringSplitOptions.RemoveEmptyEntries);
+            int numOfDocsAdded = 0;
             foreach (string d in docs)
             {
                 string[] split = d.Split(' ');
                 double precentage;
                 if (double.TryParse(split[1], out precentage))
+                {
                     m_similarDoc.Add(new Tuple<string, double>(split[0], precentage));
+                    numOfDocsAdded++;
+                }
+                if (numOfDocsAdded == 5) break;
             }
         }
         public List<Tuple<string,double>> SimilarDocuments { get { return m_similarDoc; } }

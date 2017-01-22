@@ -24,7 +24,7 @@ namespace IRProject.Ranker
             double wigthRank = TagRank();
             double tfidf = TfIdf();
             double cosSim = CosSim();
-            return 0.3*(0.8 * tfidf + 0.2 * placeRank+ 0*wigthRank+0*cosSim)+ 0.7*bmRank;
+            return  0.1*( 0.8*tfidf + 0.2 * placeRank + 0 *wigthRank+ 0*cosSim)+ 0.9*bmRank;
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace IRProject.Ranker
             {
                 if (q.AppearsInDoc(_doc.DocumentNumber))
                 {
-                    rank += (1 - (q.FirstAppearens(_doc.DocumentNumber) / (((double)_doc.Length))));
+                    rank += 1 - (q.FirstAppearens(_doc.DocumentNumber) / (((double)_doc.Length)));
                 }
             }
             return rank/_Query.Count;

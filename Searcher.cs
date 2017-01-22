@@ -94,7 +94,7 @@ namespace IRProject
                 {
                     q.SetPostingData(lines[q.Term.LineNumber]);
                 }
-                return FindRelevantDocsInQuery(queryTerms, languages);
+                return FindRelevantDocsToQuery(queryTerms, languages);
             }
 
 
@@ -107,7 +107,7 @@ namespace IRProject
         /// <param name="termsInQuery"></param>
         /// <param name="languages"></param>
         /// <returns>top 50 documents</returns>
-        private List<string> FindRelevantDocsInQuery(List<QueryTerm> termsInQuery, List<string> languages)
+        private List<string> FindRelevantDocsToQuery(List<QueryTerm> termsInQuery, List<string> languages)
         {
             //list of documents to rank
             HashSet<string> docOfQuery = new HashSet<string>();
@@ -119,46 +119,47 @@ namespace IRProject
                         docOfQuery.Add(doc);
                 }
             }
-            HashSet<Document> docToRank = FindDocumentsToRank(languages, docOfQuery);
+            HashSet<Document> docToRank = FindDocumentsToRankByLanguege(languages, docOfQuery);
             //rate each document
             foreach (Document d in docToRank)
             {
 
                 d.Rank = m_ranker.Rank(termsInQuery, d);
             }
-            addSimilarDocuments(ref docToRank);
-            List<string> top50 = FindTop50Docs(docToRank);
+            List<string> top50 = FindTop50Docs(addSimilarDocuments(docToRank));
             return top50;
         }
 
-        private void addSimilarDocuments(ref HashSet<Document> docToRank)
+        /// <summary>
+        /// for the documents that get the higher rank, add similar documents and give them a rank acoording to their simularity
+        /// </summary>
+        /// <param name="docToRank"> documents</param>
+        /// <returns> ranked documents </returns>
+        private Dictionary<string,double> addSimilarDocuments(HashSet<Document> docToRank)
         {
-            HashSet<string> documentesInSet = new HashSet<string>();
+            Dictionary<string, double> documentesInSet = new Dictionary<string, double>();
             List<Document> rankedDocuments = docToRank.OrderBy(p => p.Rank).ToList<Document>();
             rankedDocuments.Reverse();
             int count = 0;
             foreach (var item in rankedDocuments)
             {
-                documentesInSet.Add(item.DocumentNumber);
+                documentesInSet.Add(item.DocumentNumber,item.Rank);
             }
             foreach (Document Doc in rankedDocuments)
             {
                 if (count > 15) break;
                 count++;
-                int doccouunt = 0;
                 foreach (var similarDoc in Doc.SimilarDocuments)
                 {
-                    if (doccouunt > 4) break;
-                    doccouunt++;
-                    m_documents[similarDoc.Item1].Rank += 0.8*Doc.Rank * similarDoc.Item2;
+                    double similarityRank = 0.8*Doc.Rank * similarDoc.Item2;
 
-                    if (!documentesInSet.Contains(similarDoc.Item1))
-                    {
-                        documentesInSet.Add(similarDoc.Item1);
-                        docToRank.Add(m_documents[similarDoc.Item1]);
-                    }
+                    if (!documentesInSet.ContainsKey(similarDoc.Item1))
+                        documentesInSet.Add(similarDoc.Item1,similarityRank);
+                    else
+                        documentesInSet[similarDoc.Item1] += similarityRank;
                 }
             }
+            return documentesInSet;
         }
 
         /// <summary>
@@ -166,16 +167,21 @@ namespace IRProject
         /// </summary>
         /// <param name="docToRank">documents</param>
         /// <returns>list of top 50 docs</returns>
-        private List<string> FindTop50Docs(HashSet<Document> docToRank)
+        private List<string> FindTop50Docs(Dictionary<string, double> docToRank)
         {
+            List<Tuple<string, double>> documents = new List<Tuple<string, double>>();
+            foreach (var item in docToRank)
+            {
+                documents.Add(new Tuple<string,double>( item.Key, item.Value));
+            }
+            documents = documents.OrderBy(d => d.Item2).ToList();
+            documents.Reverse();
             List<string> topdocs = new List<string>();
-            List<Document> rankedDoc = docToRank.OrderBy(p => p.Rank).ToList<Document>();
-            rankedDoc.Reverse();
-            foreach (Document d in rankedDoc)
+            foreach (var d in documents)
             {
                 if (topdocs.Count < 50)
-                    topdocs.Add(d.DocumentNumber);
-                d.Rank = 0;
+                    topdocs.Add(d.Item1);
+                
             }
             return topdocs;
         }
@@ -186,7 +192,7 @@ namespace IRProject
         /// </summary>
         /// <param name="languages">langueges</param>
         /// <returns> list of documents according to the given langueges </returns>
-        private HashSet<Document> FindDocumentsToRank(List<string> languages,HashSet<string> docs)
+        private HashSet<Document> FindDocumentsToRankByLanguege(List<string> languages,HashSet<string> docs)
         {
             HashSet<Document> docToRank = new HashSet<Document>();
             if (!languages.Contains("All"))
