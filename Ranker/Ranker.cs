@@ -20,11 +20,12 @@ namespace IRProject.Ranker
             _doc = doc;
             _Query = Query;
             double bmRank = bm.Score(doc, _Query);
-            double placeRank = PlaceRank();
+            double placeRank = LocationRank();
             double wigthRank = TagRank();
             double tfidf = TfIdf();
             double cosSim = CosSim();
-            return  0.1*( 0.8*tfidf + 0.2 * placeRank + 0 *wigthRank+ 0*cosSim)+ 0.9*bmRank;
+            double dateRank = DateRank();
+            return  0.995*( 0.8*tfidf + 0.2 * placeRank + 0 *wigthRank+ 0*cosSim)+ 0.9*bmRank +0.005*dateRank;
         }
 
         /// <summary>
@@ -77,7 +78,7 @@ namespace IRProject.Ranker
         /// rank by first appearence in the document
         /// </summary>
         /// <returns>rank </returns>
-        private double PlaceRank()
+        private double LocationRank()
         {
             double rank = 0;
             foreach (QueryTerm q in _Query)
@@ -100,9 +101,22 @@ namespace IRProject.Ranker
             foreach (QueryTerm q in _Query)
             {
                 if (q.AppearsInDoc(_doc.DocumentNumber))
-                    rank += q.MaxWight(_doc.DocumentNumber)*q.Wigth;
+                    rank += q.MaxWight(_doc.DocumentNumber);
             }
-            return (rank /9 );
+            return (rank /9 *_Query.Count );
+        }
+
+        private double DateRank()
+        {
+            double rank = 0;
+            if (_doc.Date != null)
+            {
+                TimeSpan deltaFromDocTOmin = TimeSpan.FromTicks((_doc.Date.Subtract(Document.MinDate).Ticks));
+                TimeSpan deltaFromMaxTOmin = TimeSpan.FromTicks((Document.MaxDate.Subtract(Document.MinDate).Ticks));
+                rank = (double)deltaFromDocTOmin.Days / deltaFromMaxTOmin.Days;
+
+            }
+            return rank;
         }
     }
 }

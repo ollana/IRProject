@@ -126,19 +126,20 @@ namespace IRProject
 
                 d.Rank = m_ranker.Rank(termsInQuery, d);
             }
-            List<string> top50 = FindTop50Docs(addSimilarDocuments(docToRank));
+            List<string> top50 = FindTop50Docs(addSimilarDocuments(docToRank,languages));
             return top50;
         }
 
         /// <summary>
         /// for the documents that get the higher rank, add similar documents and give them a rank acoording to their simularity
         /// </summary>
-        /// <param name="docToRank"> documents</param>
+        /// <param name="rankedDoc"> documents</param>
+        /// <param name="rankedDoc"> documents</param>
         /// <returns> ranked documents </returns>
-        private Dictionary<string,double> addSimilarDocuments(HashSet<Document> docToRank)
+        private Dictionary<string,double> addSimilarDocuments(HashSet<Document> rankedDoc, List<string> languges)
         {
             Dictionary<string, double> documentesInSet = new Dictionary<string, double>();
-            List<Document> rankedDocuments = docToRank.OrderBy(p => p.Rank).ToList<Document>();
+            List<Document> rankedDocuments = rankedDoc.OrderBy(p => p.Rank).ToList<Document>();
             rankedDocuments.Reverse();
             int count = 0;
             foreach (var item in rankedDocuments)
@@ -151,12 +152,16 @@ namespace IRProject
                 count++;
                 foreach (var similarDoc in Doc.SimilarDocuments)
                 {
-                    double similarityRank = 0.8*Doc.Rank * similarDoc.Item2;
+                    //if the document is in a matching the languege list given by the user
+                    if (languges.Contains("All") || languges.Contains(m_documents[similarDoc.Item1].Language))
+                   {
+                        double similarityRank = 0.8 * Doc.Rank * similarDoc.Item2;
 
-                    if (!documentesInSet.ContainsKey(similarDoc.Item1))
-                        documentesInSet.Add(similarDoc.Item1,similarityRank);
-                    else
-                        documentesInSet[similarDoc.Item1] += similarityRank;
+                        if (!documentesInSet.ContainsKey(similarDoc.Item1))
+                            documentesInSet.Add(similarDoc.Item1, similarityRank);
+                        else
+                            documentesInSet[similarDoc.Item1] += similarityRank;
+                    }
                 }
             }
             return documentesInSet;
