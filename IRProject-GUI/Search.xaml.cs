@@ -167,7 +167,7 @@ namespace IRProject_GUI
         /// </summary>
         private void showResults()
         {
-            Search_Results_num.Text = SearchResults.Count.ToString();
+            Search_Results_num.Text = "Number of relevant documents: " +SearchResults.Count.ToString();
             Search_Results_num.Visibility = System.Windows.Visibility.Visible;
             Search_Results.Visibility = System.Windows.Visibility.Visible;
             Results_lv.ItemsSource = SearchResults;
@@ -297,7 +297,7 @@ namespace IRProject_GUI
         /// <param name="e"></param>
         private void query_KeyDown(object sender, KeyEventArgs e)
         {
-            Query = (sender as TextBox).Text;
+            
             if (e.Key == Key.Space)
             {              
                 if (Query.Split(' ').Length == 1)
@@ -305,12 +305,13 @@ namespace IRProject_GUI
                     if (MySearcher != null)
                     {
                         autoComplete = MySearcher.AutoComplete(Query);
+                        auto_complete.SelectedIndex = 0;
                         if (autoComplete.Count > 0) auto_complete1.Content = autoComplete[0];
                         if (autoComplete.Count > 1) auto_complete2.Content = autoComplete[1];
                         if (autoComplete.Count > 2) auto_complete3.Content = autoComplete[2];
                         if (autoComplete.Count > 3) auto_complete4.Content = autoComplete[3];
                         if (autoComplete.Count > 4) auto_complete5.Content = autoComplete[4];
-                        auto_complete.Visibility = Visibility.Visible;
+                        if(autoComplete.Count>0) auto_complete.Visibility = Visibility.Visible;
                     }
                 }
                 else
@@ -322,7 +323,7 @@ namespace IRProject_GUI
             {
                 clearAoutoComplete();
             }
-            if (e.Key == Key.Down)
+            else if (e.Key == Key.Down)
             {
                 if (auto_complete.SelectedIndex < 4)
                     auto_complete.SelectedIndex++;
@@ -381,29 +382,6 @@ namespace IRProject_GUI
             Query = "";
         }
         /// <summary>
-        /// for selecting auto complete 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void auto_complete_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            if(e.Key == Key.Down)
-            {
-                if (auto_complete.SelectedIndex>0)
-                    auto_complete.SelectedIndex = auto_complete.SelectedIndex--;
-            }
-            else if (e.Key == Key.Up)
-            {
-                if (auto_complete.SelectedIndex < 4)
-                    auto_complete.SelectedIndex = auto_complete.SelectedIndex++;
-            }
-            else if (e.Key == Key.Tab)
-            {
-                Query += ((ListBoxItem)auto_complete.SelectedItem).Content.ToString();
-                auto_complete.Visibility = Visibility.Hidden;
-            }
-        }
-        /// <summary>
         /// click on the auto complete term
         /// </summary>
         /// <param name="sender"></param>
@@ -421,12 +399,26 @@ namespace IRProject_GUI
         /// <param name="e"></param>
         private void Reset_Click(object sender, RoutedEventArgs e)
         {
+            if(SearchResults.Count==0 || !Home.DicLoaded)
+            {
+                MessageBox.Show("There is nothing to delete");
+                return;
+            }
             SearchResults.Clear();
             Results_lv.Visibility = Visibility.Hidden;
             Search_Results_num.Visibility = System.Windows.Visibility.Hidden;
             Search_Results.Visibility = System.Windows.Visibility.Hidden;
             if(QuerySavePath!=""  && System.IO.File.Exists(QuerySavePath + "\\results.txt"))
                 System.IO.File.Delete(QuerySavePath + "\\results.txt");
+        }
+        /// <summary>
+        /// change query text
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void query_LostFocus(object sender, RoutedEventArgs e)
+        {
+            Query = (sender as TextBox).Text;
         }
     }
 }

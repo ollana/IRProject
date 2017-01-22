@@ -4,16 +4,16 @@
 winexe
 C#
 .cs
-C:\Users\Olga\Documents\GitHub\IRProject\IRProject-GUI\obj\x64\Debug\
+D:\ADI\GitHub\IRProject\IRProject-GUI\obj\x64\Debug\
 IRProject_GUI
 none
 false
 DEBUG;TRACE
-C:\Users\Olga\Documents\GitHub\IRProject\IRProject-GUI\App.xaml
+D:\ADI\GitHub\IRProject\IRProject-GUI\App.xaml
 41797704896
 
 8407206451
-15944497596
+15-1448088175
 DictionaryWindow.xaml;MainWindow.xaml;Home.xaml;Search.xaml;
 
 False
