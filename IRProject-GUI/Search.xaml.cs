@@ -14,8 +14,8 @@ namespace IRProject_GUI
     {
         public string QueryFile { get { return file_path.Text; } set { _queryFile = value; file_path.Text = value; } }
         public string QuerySavePath { get { return Save_path.Text; } set { _querySavePath = value; Save_path.Text = value; m_program.SaveQuery = value; } }
-        public string Query { get { return query.Text; } set { _query = value; query.Text = value;} }
-        public List<string> Languages { get { return Chosen_languages; } set { Chosen_languages=value; } }
+        public string Query { get { return query.Text; } set { _query = value; query.Text = value; } }
+        public List<string> Languages { get { return Chosen_languages; } set { Chosen_languages = value; } }
         public List<Tuple<int, string>> SearchResults { get { return results; } set { results = value; } }
         public Searcher MySearcher { get { return Home.m_searcher; } }
 
@@ -76,15 +76,6 @@ namespace IRProject_GUI
         private void file_path_LostFocus(object sender, TextChangedEventArgs e)
         {
             QueryFile = (sender as TextBox).Text;
-        }
-        /// <summary>
-        /// change query 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void query_LostFocus(object sender, RoutedEventArgs e)
-        {
-            Query = (sender as TextBox).Text;
         }
         /// <summary>
         /// brows query file from dialog
@@ -306,8 +297,9 @@ namespace IRProject_GUI
         /// <param name="e"></param>
         private void query_KeyDown(object sender, KeyEventArgs e)
         {
+            Query = (sender as TextBox).Text;
             if (e.Key == Key.Space)
-            {
+            {              
                 if (Query.Split(' ').Length == 1)
                 {
                     if (MySearcher != null)
@@ -435,8 +427,6 @@ namespace IRProject_GUI
             Search_Results.Visibility = System.Windows.Visibility.Hidden;
             if(QuerySavePath!=""  && System.IO.File.Exists(QuerySavePath + "\\results.txt"))
                 System.IO.File.Delete(QuerySavePath + "\\results.txt");
-
-
         }
     }
 }

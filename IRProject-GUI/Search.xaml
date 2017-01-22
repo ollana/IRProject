@@ -9,13 +9,13 @@
     <Grid Style="{StaticResource ContentRoot}">
         <ScrollViewer>
             <StackPanel PreviewKeyDown="auto_complete_PreviewKeyDown">
-                <TextBlock TextWrapping="Wrap" Foreground="LightCoral"  >
-                    To use the search service you MUST load the dictinary first, to do so- go to the 'Index' tab and load it with or without stemming. Your search will be done according to that choice, you can change it any time in the 'index' tab, make sure you reload the dictionary. 
+                <TextBlock TextWrapping="Wrap" Foreground="LightSalmon">                 
+                    *To use the search service you MUST load the dictionary first
                 </TextBlock>
-                <TextBlock></TextBlock>
+                <TextBlock/>
                 <TextBlock Text="Languages"/>
                 <ScrollViewer>
-                    <ListBox x:Name="Language_select" Height="100"  Margin="-7,5,0,5" SelectionMode="Multiple" BorderBrush="Teal" BorderThickness="1" Width="500" HorizontalAlignment="Center" SelectionChanged="languages_SelectionChanged">
+                    <ListBox x:Name="Language_select" Height="100" Width="500" Margin="0,10,0,10" SelectionMode="Multiple" BorderBrush="Teal" BorderThickness="1" HorizontalAlignment="Center" SelectionChanged="languages_SelectionChanged">
                         <ListBox.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <UniformGrid Columns="4"/>
@@ -39,19 +39,18 @@
                 </TextBlock>
                 <TextBlock Margin="2,10,0,0">
                     <RadioButton Name="search_radio" Content="Search:      " Margin="0,-7,0,0" FontSize="16" Click="Search_radio"/>
-                    <TextBox Name="query" Width="250" Height="25" LostFocus="query_LostFocus" PreviewKeyDown="query_KeyDown" />
+                    <TextBox Name="query" Width="250" Height="25" PreviewKeyDown="query_KeyDown" />
                     <Button Height="25" Click="SEARCH_Click">
                         <Image Source="Resources\Search_Icon.png"></Image>
                     </Button>
                 </TextBlock>
-                <ListBox x:Name="auto_complete" Margin="102,0,0,0" SelectedIndex="0" MouseDown="auto_complete_MouseDown" BorderBrush="Teal" BorderThickness="1" Width="250" HorizontalAlignment="Left" Visibility="Hidden" >
+                <ListBox x:Name="auto_complete" Margin="100,0,0,0" SelectedIndex="0" MouseDown="auto_complete_MouseDown" BorderBrush="Teal" BorderThickness="1" Width="250" HorizontalAlignment="Left" Visibility="Hidden" >
                     <ListBoxItem x:Name="auto_complete1" Content=""/>
                     <ListBoxItem x:Name="auto_complete2" Content="" />
                     <ListBoxItem x:Name="auto_complete3" Content=""/>
                     <ListBoxItem x:Name="auto_complete4" Content=""/>
                     <ListBoxItem x:Name="auto_complete5" Content=""/>
                 </ListBox>
-                
                 <Button Name="reset_button" Content="Reset" HorizontalAlignment="Center" Click="Reset_Click" />
                 <TextBlock Text="Search Results:" Name="Search_Results" Visibility="Hidden"/>
                 <ListView x:Name="Results_lv" Height="200"/>
