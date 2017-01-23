@@ -20,12 +20,12 @@ namespace IRProject.Ranker
             _doc = doc;
             _Query = Query;
             double bmRank = bm.Score(doc, _Query);
-            double placeRank = LocationRank();
-            double wigthRank = TagRank();
+            double locationRank = LocationRank();
+            double tagRank = TagRank();
             double tfidf = TfIdf();
             double cosSim = CosSim();
             double dateRank = DateRank();
-            return  0.995*( 0.8*tfidf + 0.2 * placeRank + 0 *wigthRank+ 0*cosSim)+ 0.9*bmRank +0.005*dateRank;
+            return  bmRank + 0.5 * (0.8 * tfidf + 0.2 * locationRank)  + 0.5 * dateRank + 0 * tagRank + 0 * cosSim;
         }
 
         /// <summary>

@@ -1,1 +1,9 @@
 D:\oll\IRProject\obj\x64\Release\IRProject.csprojResolveAssemblyReference.cache
+C:\Users\Olga\Documents\GitHub\IRProject\bin\x64\Release\IRProject.exe.config
+C:\Users\Olga\Documents\GitHub\IRProject\bin\x64\Release\IRProject.exe
+C:\Users\Olga\Documents\GitHub\IRProject\bin\x64\Release\IRProject.pdb
+C:\Users\Olga\Documents\GitHub\IRProject\bin\x64\Release\Newtonsoft.Json.dll
+C:\Users\Olga\Documents\GitHub\IRProject\bin\x64\Release\Newtonsoft.Json.xml
+C:\Users\Olga\Documents\GitHub\IRProject\obj\x64\Release\IRProject.csprojResolveAssemblyReference.cache
+C:\Users\Olga\Documents\GitHub\IRProject\obj\x64\Release\IRProject.exe
+C:\Users\Olga\Documents\GitHub\IRProject\obj\x64\Release\IRProject.pdb
